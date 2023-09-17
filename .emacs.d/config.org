@@ -65,7 +65,11 @@
 
 #+end_src
 
-** Important misc
+** Ivy, counsel, ido modes
++ Ido - out of the box standard Emacs completion engine
++ Ivy - external completion engine
++ Counsel - another extension for Ivy completion engine
+
 *** Ido mode
 #+begin_src emacs-lisp
 (ido-mode t)
@@ -73,10 +77,20 @@
 
 *** Ivy
 #+begin_src emacs-lisp
-(require 'ivy)
-(ivy-mode)
-(setq ivy-use-virtual-buffers t)
-(setq enable-recursive-minibuffers t)
+(use-package counsel
+	:after ivy
+	:config (counsel-mode))
+
+(use-package ivy
+	:bind
+	(("C-c C-r" . ivy-resume)
+	("C-x B" . ivy-switch-buffer-other-window))
+	:custom
+	(setq ivy-use-virtual-buffers t)
+	(setq enable-recursive-minibuffers t)
+	(setq ivy-count-format "(%d/%d) ")
+	:config
+	(ivy-mode))
 #+end_src
 
 ** Git
@@ -150,26 +164,36 @@ global-git-gutter-mode t)
 	(add-hook 'markdown-mode-hook (lambda () (markdown-mode 1))))
 #+end_src
 
+*** Yaml mode
+#+begin_src emacs-lisp
+(use-package yaml-mode
+	:config
+	(add-hook 'yaml-mode-hook (lambda () (yaml-mode 1))))
+#+end_src
+
 ** Utility packages
 *** Flycheck
 #+begin_src emacs-lisp
-(require 'flycheck)
-(global-flycheck-mode)
-(with-eval-after-load 'flycheck
-  (add-hook 'flycheck-mode-hook #'flycheck-inline-mode))
+(use-package flycheck
+	:config
+  (global-flycheck-mode)
+  (with-eval-after-load 'flycheck
+  (add-hook 'flycheck-mode-hook #'flycheck-inline-mode)))
 #+end_src
 
 *** Flycheck rust
 #+begin_src emacs-lisp
-(require 'flycheck-rust)
-(with-eval-after-load 'rust-mode
-  (add-hook 'flycheck-mode-hook #'flycheck-rust-setup))
+(use-package flycheck-rust
+	:config
+	(with-eval-after-load 'rust-mode
+  (add-hook 'flycheck-mode-hook #'flycheck-rust-setup)))
 #+end_src
 
 *** Eglot
 #+begin_src emacs-lisp
-(require 'eglot)
-(add-hook 'rust-mode-hook 'eglot-ensure)
+(use-package eglot
+	:config
+	(add-hook 'rust-mode-hook 'eglot-ensure))
 #+end_src
 
 *** Yasnippet
@@ -179,9 +203,16 @@ global-git-gutter-mode t)
 #+end_src
 
 *** Company
++ Defining `global-company-mode`
++ Setting default keybindings to `C-n` and `C-p` for company selection
+
 #+begin_src emacs-lisp
-(require 'company)
-(global-company-mode)
+(use-package company
+	:config
+	(global-company-mode)
+	:bind (:map company-active-map
+		("C-n" . company-select-next-or-abort)
+		("C-p" . company-select-previous-or-abort)))
 #+end_src
 
 ** Tide
@@ -209,4 +240,5 @@ global-git-gutter-mode t)
 ;; (add-hook 'before-save-hook 'tide-format-before-save)
 
 #+end_src
+
 

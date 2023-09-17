@@ -18,12 +18,12 @@
 (global-display-line-numbers-mode)
 (setq display-line-numbers 'relative)
 
-(set-face-attribute 'default nil :height 150)
-(set-face-attribute 'default nil :font "Fira Code" :height 150)
-
 (setq make-backup-files nil)
 
 (global-auto-revert-mode t)
+
+(set-face-attribute 'default nil :height 140)
+(set-face-attribute 'default nil :font "Fira Code" :height 140)
 
 ;; Insert new line below current line
 (global-set-key (kbd "<C-return>") (lambda ()
@@ -40,10 +40,20 @@
 
 (ido-mode t)
 
-(require 'ivy)
-(ivy-mode)
-(setq ivy-use-virtual-buffers t)
-(setq enable-recursive-minibuffers t)
+(use-package counsel
+	:after ivy
+	:config (counsel-mode))
+
+(use-package ivy
+	:bind
+	(("C-c C-r" . ivy-resume)
+	("C-x B" . ivy-switch-buffer-other-window))
+	:custom
+	(setq ivy-use-virtual-buffers t)
+	(setq enable-recursive-minibuffers t)
+	(setq ivy-count-format "(%d/%d) ")
+	:config
+	(ivy-mode))
 
 (require 'magit)
 
@@ -79,6 +89,14 @@ global-git-gutter-mode t)
 (use-package org-bullets
 	:config
 	(add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
+
+(use-package markdown-mode
+	:config
+	(add-hook 'markdown-mode-hook (lambda () (markdown-mode 1))))
+
+(use-package yaml-mode
+	:config
+	(add-hook 'yaml-mode-hook (lambda () (yaml-mode 1))))
 
 (require 'flycheck)
 (global-flycheck-mode)

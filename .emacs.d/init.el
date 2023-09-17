@@ -44,7 +44,7 @@
  '(org-fontify-done-headline nil)
  '(org-fontify-todo-headline nil)
  '(package-selected-packages
-   '(markdown-mode doom-themes magit evil tide web-mode typescript-mode dockerfile-mode vterm eglot company flycheck-inline flycheck-rust flycheck gruber-darker-theme use-package ivy git-gutter rust-mode cmake-mode spacemacs-theme))
+   '(yaml-mode counsel markdown-mode doom-themes magit evil tide web-mode typescript-mode dockerfile-mode vterm eglot company flycheck-inline flycheck-rust flycheck gruber-darker-theme use-package ivy git-gutter rust-mode cmake-mode spacemacs-theme))
  '(pdf-view-midnight-colors '("#b2b2b2" . "#292b2e"))
  '(rustic-ansi-faces
    ["#1e1e1e" "#D16969" "#579C4C" "#D7BA7D" "#339CDB" "#C586C0" "#85DDFF" "#d4d4d4"])
