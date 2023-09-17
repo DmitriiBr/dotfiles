@@ -8,6 +8,9 @@
 
 ;; ----- ido-work-directory-list -----
 (
+ "/home/dmitrii/"
+ "/home/dmitrii/repos/solidjs-new/src/"
+ "/home/dmitrii/repos/"
  "/home/dmitrii/.emacs.d/"
  "/home/dmitrii/.config/emacs/"
 )
@@ -21,9 +24,17 @@
 
 ;; ----- ido-dir-file-cache -----
 (
- ("/home/dmitrii/.emacs.d/" (25861 57266 83873 932000) "config.org" "config.el" "auto-save-list/" "../" "ido.last" "recentf" "config.org~" "transient/" "init.el" "./" "ido.last~" ".emacs.d2/" "elpa/")
+ ("/home/dmitrii/repos/solidjs-new/src/" (25863 8672 935629 574000) "App.module.css" "index.tsx" "../" "App.tsx" "examples/" "logo.svg" "todo-app/" "index.css" "assets/" "./")
 
- ("/home/dmitrii/" (25861 51520 343981 704000) ".docker/" ".bashrc" ".wget-hsts" "Public/" ".gnome/" ".vscode/" ".dotnet/" "Desktop/" ".degit/" "get-docker.sh" "Videos/" ".profile" ".git/" "snap/" "Downloads/" "../" ".vim/" ".nvidia-settings-rc" ".npm/" "Music/" ".lesshst" "apps/" ".gitignore" "repos/" ".git-credentials" ".config/" ".rustup/" ".cache/" ".sudo_as_admin_successful" ".emacs.d/" ".local/" "./" ".bash_logout" ".gitconfig" "Templates/" ".tmux.conf" "Pictures/" ".ssh/" ".apport-ignore.xml" ".gnupg/" "Documents/" ".bash_history" ".cargo/" ".pki/")
+ ("/home/dmitrii/.emacs.d/" (25863 6805 659204 388000) "config.org" "config.el" "auto-save-list/" "../" "ido.last" "README.md" "recentf" "transient/" "init.el" "./" ".emacs.d2/" "elpa/")
+
+ ("/home/dmitrii/" (25862 64076 384393 990000) ".docker/" ".bashrc" ".wget-hsts" "Public/" ".gnome/" ".vscode/" ".dotnet/" "Desktop/" ".degit/" "get-docker.sh" "Videos/" ".profile" ".git/" "snap/" "Downloads/" "../" ".vim/" ".nvidia-settings-rc" ".npm/" "Music/" ".lesshst" "apps/" ".gitignore" "repos/" ".git-credentials" ".config/" ".rustup/" ".cache/" ".sudo_as_admin_successful" ".emacs.d/" ".local/" "./" ".bash_logout" ".gitconfig" "Templates/" ".tmux.conf" "Pictures/" ".ssh/" ".apport-ignore.xml" ".gnupg/" "Documents/" ".bash_history" ".cargo/" ".pki/")
+
+ ("/home/dmitrii/repos/" (25843 11327 368959 108000) "fake-router/" "../" "sadix-ui/" "spa-infra/" "./" "solidjs-new/" "rust-for-fools/" "leetcode/")
+
+ ("/home/dmitrii/repos/rust-for-fools/" (25856 45746 898912 68000) "src/" ".git/" "Cargo.toml" "../" "target/" ".gitignore" "Cargo.lock" "./")
+
+ ("/home/dmitrii/repos/rust-for-fools/src/" (25863 5028 989636 512000) "problems/" "strings.rs" "rustlings/" "../" "main.rs" "algorithms/" "./" "guessing_game.rs")
 
  ("/home/dmitrii/.config/emacs/" (25861 46030 384140 260000) "config.org" "config.el" "auto-save-list/" "../" "ido.last" "recentf" "transient/" "init.el" "./" "elpa/" "init.el~")
 

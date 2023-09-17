@@ -42,9 +42,14 @@
 
 (use-package counsel
 	:after ivy
-	:config (counsel-mode))
+	:diminish
+	:config 
+	  (counsel-mode)
+	  (setq ivy-initial-inputs-alist nil))
 
 (use-package ivy
+	:ensure t
+	:diminish
 	:bind
 	(("C-c C-r" . ivy-resume)
 	("C-x B" . ivy-switch-buffer-other-window))
@@ -77,9 +82,12 @@ global-git-gutter-mode t)
 	(add-hook 'typescript-mode-hook (lambda () (typescript-mode 1)))
 )
 
-(use-package web-mode)
-(add-to-list 'auto-mode-alist '("\\.jsx\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.tsx\\'" . web-mode))
+(use-package web-mode
+	  :config
+    (add-to-list 'auto-mode-alist '("\\.jsx\\'" . web-mode))
+    (add-to-list 'auto-mode-alist '("\\.tsx\\'" . web-mode)))
+
+(use-package js2-mode)
 
 (use-package rust-mode)
 
@@ -98,23 +106,72 @@ global-git-gutter-mode t)
 	:config
 	(add-hook 'yaml-mode-hook (lambda () (yaml-mode 1))))
 
-(require 'flycheck)
-(global-flycheck-mode)
-(with-eval-after-load 'flycheck
-  (add-hook 'flycheck-mode-hook #'flycheck-inline-mode))
+(use-package apheleia
+    :ensure t
+    :config
+    (apheleia-global-mode +1)
+    (add-hook 'typescript-mode-hook 'prettier-rc-mode)
+    (add-hook 'js2-mode-hook 'prettier-rc-mode)
+    (add-hook 'web-mode-hook 'prettier-rc-mode))
 
-(require 'flycheck-rust)
-(with-eval-after-load 'rust-mode
-  (add-hook 'flycheck-mode-hook #'flycheck-rust-setup))
+(use-package add-node-modules-path)
 
-(require 'eglot)
-(add-hook 'rust-mode-hook 'eglot-ensure)
+(use-package eslint-rc
+	  :ensure t
+	  :config
+    (add-hook 'typescript-mode-hook 'eslint-rc-mode)
+    (add-hook 'js2-mode-hook 'eslint-rc-mode)
+    (add-hook 'web-mode-hook 'eslint-rc-mode))
+
+(use-package flycheck
+	:ensure t
+	:defer t
+	:diminish
+	:config
+  	(global-flycheck-mode)
+  	(with-eval-after-load 'flycheck
+    (add-hook 'flycheck-mode-hook #'flycheck-inline-mode)))
+
+(use-package tree-sitter
+	:ensure t
+	:diminish
+	:config
+	(use-package tree-sitter-langs
+	    :ensure t
+	    :diminish
+        :config
+        (global-tree-sitter-mode)
+        (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode)))
+
+(use-package flycheck-rust
+	:config
+	(with-eval-after-load 'rust-mode
+  (add-hook 'flycheck-mode-hook #'flycheck-rust-setup)))
+
+(use-package eglot
+	:config
+	(add-hook 'rust-mode-hook 'eglot-ensure))
 
 (require 'yasnippet)
 (setq yas-triggers-in-field nil)
 
-(require 'company)
-(global-company-mode)
+(use-package company
+	:config
+	(global-company-mode)
+	:bind (:map company-active-map
+		("C-n" . company-select-next-or-abort)
+		("C-p" . company-select-previous-or-abort)))
+
+(use-package diminish)
+
+(use-package doom-modeline
+	:ensure t
+	:init (doom-modeline-mode 1)
+    :config
+    (setq doom-modeline-height 35      
+          doom-modeline-bar-width 5
+          doom-modeline-persp-name t   
+          doom-modeline-persp-icon t))
 
 (use-package tide
 	:init 
@@ -133,7 +190,7 @@ global-git-gutter-mode t)
 	;; aligns annotation to the right hand side
 	(setq company-tooltip-align-annotations t)
 	;; if you use typescript-mode
-	(add-hook 'typescript-mode-hook #'setup-tide-mode)
-)
+	(add-hook 'typescript-mode-hook #'setup-tide-mode))
+
 ;; formats the buffer before saving
 ;; (add-hook 'before-save-hook 'tide-format-before-save)

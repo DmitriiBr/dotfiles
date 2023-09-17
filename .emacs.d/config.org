@@ -37,7 +37,9 @@
 (setq display-line-numbers 'relative)
 
 (setq make-backup-files nil)
-
+#+end_src
+*** Global auto revert mode
+#+begin_src emacs-lisp
 (global-auto-revert-mode t)
 #+end_src
 
@@ -75,13 +77,18 @@
 (ido-mode t)
 #+end_src
 
-*** Ivy
+*** Ivy (counsel)
 #+begin_src emacs-lisp
 (use-package counsel
 	:after ivy
-	:config (counsel-mode))
+	:diminish
+	:config 
+	  (counsel-mode)
+	  (setq ivy-initial-inputs-alist nil))
 
 (use-package ivy
+	:ensure t
+	:diminish
 	:bind
 	(("C-c C-r" . ivy-resume)
 	("C-x B" . ivy-switch-buffer-other-window))
@@ -134,9 +141,15 @@ global-git-gutter-mode t)
 
 *** Web mode
 #+begin_src emacs-lisp
-(use-package web-mode)
-(add-to-list 'auto-mode-alist '("\\.jsx\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.tsx\\'" . web-mode))
+(use-package web-mode
+	  :config
+    (add-to-list 'auto-mode-alist '("\\.jsx\\'" . web-mode))
+    (add-to-list 'auto-mode-alist '("\\.tsx\\'" . web-mode)))
+#+end_src
+
+*** JS2 mode
+#+begin_src emacs-lisp
+(use-package js2-mode)
 #+end_src
 
 *** Rust mode
@@ -171,16 +184,71 @@ global-git-gutter-mode t)
 	(add-hook 'yaml-mode-hook (lambda () (yaml-mode 1))))
 #+end_src
 
-** Utility packages
-*** Flycheck
+** Apheleia (prettier and other formatting, linting toold)
++ Add prettier package for emacs
++ Add package to use prettier config from local .prettierrc
+
 #+begin_src emacs-lisp
-(use-package flycheck
-	:config
-  (global-flycheck-mode)
-  (with-eval-after-load 'flycheck
-  (add-hook 'flycheck-mode-hook #'flycheck-inline-mode)))
+(use-package apheleia
+    :ensure t
+    :config
+    (apheleia-global-mode +1)
+    (add-hook 'typescript-mode-hook 'prettier-rc-mode)
+    (add-hook 'js2-mode-hook 'prettier-rc-mode)
+    (add-hook 'web-mode-hook 'prettier-rc-mode))
 #+end_src
 
+*** Add node_modules path
++ Use node_modules and pacakges from local project directory
+
+#+begin_src emacs-lisp
+(use-package add-node-modules-path)
+#+end_src
+
+*** Eslint rc
+#+begin_src emacs-lisp
+(use-package eslint-rc
+	  :ensure t
+	  :config
+    (add-hook 'typescript-mode-hook 'eslint-rc-mode)
+    (add-hook 'js2-mode-hook 'eslint-rc-mode)
+    (add-hook 'web-mode-hook 'eslint-rc-mode))
+#+end_src
+
+** Flycheck
++ Checks your code JIT
++ Also added inline-flycheck-mode
+
+#+begin_src emacs-lisp
+(use-package flycheck
+	:ensure t
+	:defer t
+	:diminish
+	:config
+  	(global-flycheck-mode)
+  	(with-eval-after-load 'flycheck
+    (add-hook 'flycheck-mode-hook #'flycheck-inline-mode)))
+#+end_src
+
+** Treesitter and Treesitter langs
++ Use tree sitter as languare syntax parser
++ Adding tres sitter langs to support syntax highlighting
++ Creating hook to enable tree sitter highilighting on every buffer open possible
+
+#+begin_src emacs-lisp
+(use-package tree-sitter
+	:ensure t
+	:diminish
+	:config
+	(use-package tree-sitter-langs
+	    :ensure t
+	    :diminish
+        :config
+        (global-tree-sitter-mode)
+        (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode)))
+#+end_src
+
+** Utility packages
 *** Flycheck rust
 #+begin_src emacs-lisp
 (use-package flycheck-rust
@@ -215,6 +283,23 @@ global-git-gutter-mode t)
 		("C-p" . company-select-previous-or-abort)))
 #+end_src
 
+** Diminish
+#+begin_src emacs-lisp
+(use-package diminish)
+#+end_src
+
+** Doom-modeline 
+#+begin_src emacs-lisp
+(use-package doom-modeline
+	:ensure t
+	:init (doom-modeline-mode 1)
+    :config
+    (setq doom-modeline-height 35      
+          doom-modeline-bar-width 5
+          doom-modeline-persp-name t   
+          doom-modeline-persp-icon t))
+#+end_src
+
 ** Tide
 #+begin_src emacs-lisp
 (use-package tide
@@ -234,11 +319,10 @@ global-git-gutter-mode t)
 	;; aligns annotation to the right hand side
 	(setq company-tooltip-align-annotations t)
 	;; if you use typescript-mode
-	(add-hook 'typescript-mode-hook #'setup-tide-mode)
-)
+	(add-hook 'typescript-mode-hook #'setup-tide-mode))
+
 ;; formats the buffer before saving
 ;; (add-hook 'before-save-hook 'tide-format-before-save)
-
 #+end_src
 
 
