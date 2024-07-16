@@ -2,14 +2,22 @@
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 
+vim.opt.winblend = 0
+
 -- Set to true if you have a Nerd Font installed and selected in the terminal
-vim.g.have_nerd_font = false
+vim.g.have_nerd_font = true
+
+vim.opt.guicursor = ""
+
+-- Decrease update time
+vim.opt.updatetime = 250
+
+-- Decrease mapped sequence wait time
+-- Displays which-key popup sooner
+vim.opt.timeoutlen = 300
 
 -- [[ Setting options ]]
 -- See `:help vim.opt`
--- NOTE: You can change these options as you wish!
---  For more options, you can see `:help option-list`
-
 -- Make line numbers default
 vim.opt.number = true
 vim.opt.relativenumber = true
@@ -21,6 +29,7 @@ vim.opt.tabstop = 4
 vim.g.netrw_browse_split = 0
 vim.g.netrw_banner = 0
 vim.g.netrw_winsize = 25
+vim.keymap.set("n", "<leader>se", "<cmd>Explore<CR>", { desc = "[S]how [E]xplorer" })
 
 -- Enable mouse mode
 vim.opt.mouse = "a"
@@ -62,7 +71,7 @@ vim.opt.splitbelow = true
 vim.opt.inccommand = "split"
 
 -- Show which line your cursor is on
-vim.opt.cursorline = true
+vim.opt.cursorline = false
 
 -- Minimal number of screen lines to keep above and below the cursor.
 vim.opt.scrolloff = 10
@@ -74,6 +83,14 @@ vim.opt.scrolloff = 10
 -- This is SUPER USEFUL!!
 vim.opt.hlsearch = true
 vim.keymap.set("n", "<Esc>", "<cmd>nohlsearch<CR>")
+
+-- Setting custom escape
+vim.keymap.set("i", "jj", "<Esc>")
+
+-- Diagnostics float window
+vim.diagnostic.config({
+	float = { border = "rounded" },
+})
 
 -- Diagnostic keymaps
 vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, { desc = "Go to previous [D]iagnostic message" })
@@ -412,6 +429,10 @@ require("lazy").setup({
 					--  See `:help K` for why this keymap.
 					map("K", vim.lsp.buf.hover, "Hover Documentation")
 
+					vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, {
+						border = "rounded",
+					})
+
 					-- WARN: This is not Goto Definition, this is Goto Declaration.
 					--  For example, in C this would take you to the header.
 					map("gD", vim.lsp.buf.declaration, "[G]oto [D]eclaration")
@@ -488,7 +509,13 @@ require("lazy").setup({
 				--    https://github.com/pmizio/typescript-tools.nvim
 				--
 				-- But for many setups, the LSP (`tsserver`) will work just fine
-				tsserver = {},
+				tsserver = {
+					typescript = {
+						preferences = {
+							importModuleSpecifierPreference = "project-relative",
+						},
+					},
+				},
 
 				lua_ls = {
 					-- cmd = {...},
@@ -604,7 +631,7 @@ require("lazy").setup({
 			vim.api.nvim_create_autocmd({ "BufEnter", "BufWritePost", "InsertLeave" }, {
 				group = lint_augroup,
 				callback = function()
-					lint.try_lint()
+					lint.try_lint(nil, { ignore_errors = true })
 				end,
 			})
 
@@ -662,7 +689,7 @@ require("lazy").setup({
 						luasnip.lsp_expand(args.body)
 					end,
 				},
-				completion = { completeopt = "menu,menuone,noinsert" },
+				completion = { completeopt = "menu" },
 
 				-- For an understanding of why these mappings were
 				-- chosen, you will need to read `:help ins-completion`
@@ -743,6 +770,14 @@ require("lazy").setup({
 			-- You can configure highlights by doing something like:
 			vim.cmd.hi("Comment gui=none")
 		end,
+		config = function()
+			require("rose-pine").setup({
+				styles = {
+					transparency = true,
+					italic = false,
+				},
+			})
+		end,
 	},
 
 	-- Highlight todo, notes, etc in comments
@@ -813,13 +848,27 @@ require("lazy").setup({
 			require("nvim-treesitter.install").prefer_git = true
 			---@diagnostic disable-next-line: missing-fields
 			require("nvim-treesitter.configs").setup(opts)
-
 			-- There are additional nvim-treesitter modules that you can use to interact
 			-- with nvim-treesitter. You should go explore a few and see what interests you:
 			--
 			--    - Incremental selection: Included, see `:help nvim-treesitter-incremental-selection-mod`
 			--    - Show your current context: https://github.com/nvim-treesitter/nvim-treesitter-context
 			--    - Treesitter + textobjects: https://github.com/nvim-treesitter/nvim-treesitter-textobjects
+		end,
+	},
+	{
+		"windwp/nvim-autopairs",
+		event = "InsertEnter",
+		-- Optional dependency
+		dependencies = { "hrsh7th/nvim-cmp" },
+		config = function()
+			require("nvim-autopairs").setup({})
+			-- If you want to automatically add `(` after selecting a function or method
+
+			local cmp_autopairs = require("nvim-autopairs.completion.cmp")
+			local cmp = require("cmp")
+
+			cmp.event:on("confirm_done", cmp_autopairs.on_confirm_done())
 		end,
 	},
 
