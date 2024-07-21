@@ -772,11 +772,20 @@ require("lazy").setup({
 		end,
 		config = function()
 			require("rose-pine").setup({
+				variant = "main",
 				styles = {
 					transparency = true,
 					italic = false,
 				},
 			})
+		end,
+	},
+
+	-- Highlight rbg, hex colors while using nvim
+	{
+		"norcalli/nvim-colorizer.lua",
+		config = function()
+			require("colorizer").setup()
 		end,
 	},
 
