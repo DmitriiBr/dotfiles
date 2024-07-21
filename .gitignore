@@ -5,8 +5,6 @@
 .bash_logout
 .cache/
 .cargo/
-.config/*
-!.config/nvim
 .emacs.d/elpa
 .degit/
 .docker/
