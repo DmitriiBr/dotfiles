@@ -1,159 +1,141 @@
---  NOTE: Must happen before plugins are loaded (otherwise wrong leader will be used)
-vim.g.mapleader = " "
-vim.g.maplocalleader = " "
+local function create_default_config()
+	vim.g.mapleader = " "
+	vim.g.maplocalleader = " "
 
-vim.opt.winblend = 0
+	vim.opt.winblend = 0
 
--- Set to true if you have a Nerd Font installed and selected in the terminal
-vim.g.have_nerd_font = true
+	-- Set to true if you have a Nerd Font installed and selected in the terminal
+	vim.g.have_nerd_font = true
 
-vim.opt.guicursor = ""
+	-- vim.opt.guicursor = ""
 
--- Decrease update time
-vim.opt.updatetime = 250
+	-- Decrease update time
+	vim.opt.updatetime = 250
 
--- Decrease mapped sequence wait time
--- Displays which-key popup sooner
-vim.opt.timeoutlen = 300
+	-- Decrease mapped sequence wait time
+	-- Displays which-key popup sooner
+	vim.opt.timeoutlen = 300
 
--- [[ Setting options ]]
--- See `:help vim.opt`
--- Make line numbers default
-vim.opt.number = true
-vim.opt.relativenumber = true
+	-- [[ Setting options ]]
+	-- See `:help vim.opt`
+	-- Make line numbers default
+	vim.opt.number = true
+	vim.opt.relativenumber = true
 
-vim.opt.shiftwidth = 4
-vim.opt.tabstop = 4
+	-- Enable mouse mode
+	vim.opt.mouse = "a"
 
--- Netrw
-vim.g.netrw_browse_split = 0
-vim.g.netrw_banner = 0
-vim.g.netrw_winsize = 25
-vim.keymap.set("n", "<leader>se", "<cmd>Explore<CR>", { desc = "[S]how [E]xplorer" })
+	-- Don't show the mode, since it's already in the status line
+	vim.opt.showmode = false
 
--- Enable mouse mode
-vim.opt.mouse = "a"
+	-- Sync clipboard between OS and Neovim.
+	vim.opt.clipboard = "unnamedplus"
 
--- Don't show the mode, since it's already in the status line
-vim.opt.showmode = false
+	-- Enable break indent
+	vim.opt.breakindent = true
 
--- Sync clipboard between OS and Neovim.
-vim.opt.clipboard = "unnamedplus"
+	-- Save undo history
+	vim.opt.undofile = true
 
--- Enable break indent
-vim.opt.breakindent = true
+	-- Case-insensitive searching UNLESS \C or one or more capital letters in the search term
+	vim.opt.ignorecase = true
+	vim.opt.smartcase = true
 
--- Save undo history
-vim.opt.undofile = true
+	-- Keep signcolumn on by default
+	vim.opt.signcolumn = "yes"
 
--- Case-insensitive searching UNLESS \C or one or more capital letters in the search term
-vim.opt.ignorecase = true
-vim.opt.smartcase = true
+	-- Decrease mapped sequence wait time
+	-- Displays which-key popup sooner
+	-- vim.opt.timeoutlen = 300
 
--- Keep signcolumn on by default
-vim.opt.signcolumn = "yes"
+	-- Configure how new splits should be opened
+	vim.opt.splitright = true
+	vim.opt.splitbelow = true
 
--- Decrease mapped sequence wait time
--- Displays which-key popup sooner
--- vim.opt.timeoutlen = 300
+	-- Sets how neovim will display certain whitespace characters in the editor.
+	--  See `:help 'list'`
+	--  and `:help 'listchars'`
+	-- vim.opt.list = true
+	-- vim.opt.listchars = { tab = " ", trail = "·", nbsp = "␣" }
 
--- Configure how new splits should be opened
-vim.opt.splitright = true
-vim.opt.splitbelow = true
+	-- Preview substitutions live, as you type!
+	vim.opt.inccommand = "split"
 
--- Sets how neovim will display certain whitespace characters in the editor.
---  See `:help 'list'`
---  and `:help 'listchars'`
--- vim.opt.list = true
--- vim.opt.listchars = { tab = " ", trail = "·", nbsp = "␣" }
+	-- Show which line your cursor is on
+	vim.opt.cursorline = false
 
--- Preview substitutions live, as you type!
-vim.opt.inccommand = "split"
+	-- Minimal number of screen lines to keep above and below the cursor.
+	vim.opt.scrolloff = 10
 
--- Show which line your cursor is on
-vim.opt.cursorline = false
+	-- [[ Basic Keymaps ]]
+	--  See `:help vim.keymap.set()`
 
--- Minimal number of screen lines to keep above and below the cursor.
-vim.opt.scrolloff = 10
+	-- Set highlight on search, but clear on pressing <Esc> in normal mode
+	-- This is SUPER USEFUL!!
+	vim.opt.hlsearch = true
+	vim.keymap.set("n", "<Esc>", "<cmd>nohlsearch<CR>")
 
--- [[ Basic Keymaps ]]
---  See `:help vim.keymap.set()`
+	-- Setting custom escape
+	vim.keymap.set("i", "jj", "<Esc>")
 
--- Set highlight on search, but clear on pressing <Esc> in normal mode
--- This is SUPER USEFUL!!
-vim.opt.hlsearch = true
-vim.keymap.set("n", "<Esc>", "<cmd>nohlsearch<CR>")
+	-- TIP: Disable arrow keys in normal mode
+	-- 'n' stays form Noraml Mode
+	vim.keymap.set("n", "<left>", '<cmd>echo "Use h to move!!"<CR>')
+	vim.keymap.set("n", "<right>", '<cmd>echo "Use l to move!!"<CR>')
+	vim.keymap.set("n", "<up>", '<cmd>echo "Use k to move!!"<CR>')
+	vim.keymap.set("n", "<down>", '<cmd>echo "Use j to move!!"<CR>')
 
--- Setting custom escape
-vim.keymap.set("i", "jj", "<Esc>")
+	-- [[ Basic Autocommands ]]
+	--  See `:help lua-guide-autocommands`
 
--- Diagnostics float window
-vim.diagnostic.config({
-	float = { border = "rounded" },
-})
-
--- Diagnostic keymaps
-vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, { desc = "Go to previous [D]iagnostic message" })
-vim.keymap.set("n", "]d", vim.diagnostic.goto_next, { desc = "Go to next [D]iagnostic message" })
-vim.keymap.set("n", "<leader>e", vim.diagnostic.open_float, { desc = "Show diagnostic [E]rror messages" })
-vim.keymap.set("n", "<leader>q", vim.diagnostic.setloclist, { desc = "Open diagnostic [Q]uickfix list" })
-
--- Exit terminal mode in the builtin terminal with a shortcut that is a bit easier
--- for people to discover. Otherwise, you normally need to press <C-\><C-n>, which
--- is not what someone will guess without a bit more experience.
---
--- NOTE: This won't work in all terminal emulators/tmux/etc. Try your own mapping
--- or just use <C-\><C-n> to exit terminal mode
-vim.keymap.set("t", "<Esc><Esc>", "<C-\\><C-n>", { desc = "Exit terminal mode" })
-
--- TIP: Disable arrow keys in normal mode
--- 'n' stays form Noraml Mode
-vim.keymap.set("n", "<left>", '<cmd>echo "Use h to move!!"<CR>')
-vim.keymap.set("n", "<right>", '<cmd>echo "Use l to move!!"<CR>')
-vim.keymap.set("n", "<up>", '<cmd>echo "Use k to move!!"<CR>')
-vim.keymap.set("n", "<down>", '<cmd>echo "Use j to move!!"<CR>')
-
--- Keybinds to make split navigation easier.
---  Use CTRL+<hjkl> to switch between windows
---
---  See `:help wincmd` for a list of all window commands
-vim.keymap.set("n", "<C-h>", "<C-w><C-h>", { desc = "Move focus to the left window" })
-vim.keymap.set("n", "<C-l>", "<C-w><C-l>", { desc = "Move focus to the right window" })
-vim.keymap.set("n", "<C-j>", "<C-w><C-j>", { desc = "Move focus to the lower window" })
-vim.keymap.set("n", "<C-k>", "<C-w><C-k>", { desc = "Move focus to the upper window" })
-
--- [[ Basic Autocommands ]]
---  See `:help lua-guide-autocommands`
-
--- Highlight when yanking (copying) text
---  Try it with `yap` in normal mode
---  See `:help vim.highlight.on_yank()`
-vim.api.nvim_create_autocmd("TextYankPost", {
-	desc = "Highlight when yanking (copying) text",
-	group = vim.api.nvim_create_augroup("highlight-yank", { clear = true }),
-	callback = function()
-		vim.highlight.on_yank()
-	end,
-})
-
--- [[ Install `lazy.nvim` plugin manager ]]
---    See `:help lazy.nvim.txt` or https://github.com/folke/lazy.nvim for more info
-local lazyrepo = "https://github.com/folke/lazy.nvim.git"
-local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
-
-if not vim.loop.fs_stat(lazypath) then
-	vim.fn.system({ "git", "clone", "--filter=blob:none", "--branch=stable", lazyrepo, lazypath })
+	-- Highlight when yanking (copying) text
+	--  Try it with `yap` in normal mode
+	--  See `:help vim.highlight.on_yank()`
+	vim.api.nvim_create_autocmd("TextYankPost", {
+		desc = "Highlight when yanking (copying) text",
+		group = vim.api.nvim_create_augroup("highlight-yank", { clear = true }),
+		callback = function()
+			vim.highlight.on_yank()
+		end,
+	})
 end
 
-vim.opt.rtp:prepend(lazypath)
+if vim.g.vscode then
+	create_default_config()
 
--- [[ Configure and install plugins ]]
---
---  To check the current status of your plugins, run
---    :Lazy
---
---  You can press `?` in this menu for help. Use `:q` to close the window
---
---  To update plugins you can run
---    :Lazy update
+	-- Keybinds to make split navigation easier.
+	-- vim.keymap.set("n", "<C-h>", "<C-w><C-h>", { desc = "Move focus to the left window" })
+	-- vim.keymap.set("n", "<C-l>", "<C-w><C-l>", { desc = "Move focus to the right window" })
+	-- vim.keymap.set("n", "<C-j>", "<C-w><C-j>", { desc = "Move focus to the lower window" })
+	-- vim.keymap.set("n", "<C-k>", "<C-w><C-k>", { desc = "Move focus to the upper window" })
 
+
+	-- Diagnostic keymaps
+	-- vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, { desc = "Go to previous [D]iagnostic message" })
+	-- vim.keymap.set("n", "]d", vim.diagnostic.goto_next, { desc = "Go to next [D]iagnostic message" })
+	-- vim.keymap.set("n", "<leader>e", vim.diagnostic.open_float, { desc = "Show diagnostic [E]rror messages" })
+	-- vim.keymap.set("n", "<leader>q", vim.diagnostic.setloclist, { desc = "Open diagnostic [Q]uickfix list" })
+else
+	create_default_config()
+
+	vim.opt.shiftwidth = 4
+	vim.opt.tabstop = 4
+
+	-- Diagnostics float window
+	vim.diagnostic.config({
+		float = { border = "rounded" },
+	})
+
+	-- Keybinds to make split navigation easier.
+	-- vim.keymap.set("n", "<C-h>", "<C-w><C-h>", { desc = "Move focus to the left window" })
+	-- vim.keymap.set("n", "<C-l>", "<C-w><C-l>", { desc = "Move focus to the right window" })
+	-- vim.keymap.set("n", "<C-j>", "<C-w><C-j>", { desc = "Move focus to the lower window" })
+	-- vim.keymap.set("n", "<C-k>", "<C-w><C-k>", { desc = "Move focus to the upper window" })
+
+
+	-- Diagnostic keymaps
+	-- vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, { desc = "Go to previous [D]iagnostic message" })
+	-- vim.keymap.set("n", "]d", vim.diagnostic.goto_next, { desc = "Go to next [D]iagnostic message" })
+	-- vim.keymap.set("n", "<leader>e", vim.diagnostic.open_float, { desc = "Show diagnostic [E]rror messages" })
+	-- vim.keymap.set("n", "<leader>q", vim.diagnostic.setloclist, { desc = "Open diagnostic [Q]uickfix list" })
+end
