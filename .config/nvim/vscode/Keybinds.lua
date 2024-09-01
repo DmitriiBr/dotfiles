@@ -40,6 +40,10 @@ local function KeybindsConstructor()
             self.map_vscode_call("n", "<leader>e", "workbench.action.showErrorsWarnings",
                 "Show diagnostic [E]rror messages")
             -- vim.keymap.set("n", "<leader>q", vim.diagnostic.setloclist, { desc = "Open diagnostic [Q]uickfix list" })
+        end,
+        file_management = function()
+            self.map_vscode_call("n", "<leader>se", "workbench.view.explorer", "[S]how [E]xplorer")
+            self.map_vscode_call("n", "<leader>sb", "workbench.action.toggleSidebarVisibility", "Toggle sidebar")
         end
     }
 end

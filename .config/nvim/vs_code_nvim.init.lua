@@ -1,9 +1,9 @@
-local Config = require('./vscode/Config')
-local Keybinds = require('./vscode/Keybinds')
+local Config = require("./vscode/Config")
+local Keybinds = require("./vscode/Keybinds")
 
 if vim.g.vscode then
-	local config = Config();
-	local keybinds = Keybinds();
+	local config = Config()
+	local keybinds = Keybinds()
 
 	config.create()
 
@@ -11,6 +11,7 @@ if vim.g.vscode then
 	keybinds.navigation()
 	keybinds.splitting()
 	keybinds.diagnostics()
+	keybinds.file_management()
 else
 	-- Main Neovim config in ./init.lua
 end
