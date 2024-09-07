@@ -25,11 +25,11 @@ vim.opt.relativenumber = true
 vim.opt.shiftwidth = 4
 vim.opt.tabstop = 4
 
--- netrw
-vim.g.netrw_browse_split = 0
-vim.g.netrw_banner = 0
-vim.g.netrw_winsize = 25
-vim.keymap.set("n", "<leader>se", "<cmd>Explore<cr>", { desc = "[s]how [e]xplorer" })
+-- netrw, if you use it
+-- vim.g.netrw_browse_split = 0
+-- vim.g.netrw_banner = 0
+-- vim.g.netrw_winsize = 25
+-- vim.keymap.set("n", "<leader>se", "<cmd>Explore<cr>", { desc = "[s]how [e]xplorer" })
 
 -- enable mouse mode
 vim.opt.mouse = "a"
