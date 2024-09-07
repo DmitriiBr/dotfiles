@@ -1,8 +1,14 @@
+-- Helps to split Keybinding by groups
 local function KeybindsConstructor()
     local vscode = require("vscode")
 
     local self = {
-        map_vscode_call = function(mode, keybind, vscode_action_id, desc)
+        ---@param mode string
+        ---@param vscode_action_id string
+        ---@param keybind string
+        ---@param desc string
+        map_vscode_call = function(
+            mode, keybind, vscode_action_id, desc)
             local function get_error(message) return "NOT DEFINED: " .. message end
 
             if mode == nil then error(get_error("Argument [mode] is not defined")) end
@@ -42,7 +48,7 @@ local function KeybindsConstructor()
             -- vim.keymap.set("n", "<leader>q", vim.diagnostic.setloclist, { desc = "Open diagnostic [Q]uickfix list" })
         end,
         file_management = function()
-            self.map_vscode_call("n", "<leader>se", "workbench.view.explorer", "[S]how [E]xplorer")
+            self.map_vscode_call("n", "-", "workbench.view.explorer", "[S]how [E]xplorer")
             self.map_vscode_call("n", "<leader>sb", "workbench.action.toggleSidebarVisibility", "Toggle sidebar")
         end
     }

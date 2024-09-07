@@ -1,0 +1,80 @@
+{
+  // Font family
+  "editor.fontFamily": "GeistMono Nerd Font",
+  "scm.inputFontFamily": "GeistMono Nerd Font",
+  "chat.editor.fontFamily": "GeistMono Nerd Font",
+  "debug.console.fontFamily": "GeistMono Nerd Font",
+  "editor.codeLensFontFamily": "GeistMono Nerd Font",
+  "notebook.output.fontFamily": "GeistMono Nerd Font",
+  "markdown.preview.fontFamily": "GeistMono Nerd Font",
+  "editor.inlayHints.fontFamily": "GeistMono Nerd Font",
+  "terminal.integrated.fontFamily": "GeistMono Nerd Font",
+
+  // Font size
+  "editor.fontSize": 18,
+  "terminal.integrated.fontSize": 18,
+
+  // ui
+  "editor.minimap.enabled": false,
+  "window.commandCenter": false,
+  "editor.scrollbar.vertical": "hidden",
+  "window.titleBarStyle": "custom",
+  "editor.scrollbar.horizontal": "hidden",
+  "workbench.editor.showTabs": "none",
+  "editor.smoothScrolling": true,
+  "workbench.activityBar.location": "default",
+
+  // APC
+  "apc.activityBar": {
+    "hideSettings": true
+  },
+  "apc.electron": {
+    "titleBarStyle": "hiddenInset",
+    "trafficLightPosition": {
+      "x": 12,
+      "y": 10
+    }
+  },
+  "apc.font.family": "GeistMono Nerd Font",
+  "apc.monospace.font.family": "GeistMono Nerd Font",
+  "apc.statusBar": {
+    "position": "bottom"
+  },
+
+  // Custom css
+  "apc.stylesheet": {
+    ".title-label": "display: none !important",
+    ".title-actions": "display: none !important",
+    ".titlebar-center": "display: none !important",
+    ".titlebar-right": "display: none !important"
+  },
+
+  // Misc
+  "workbench.startupEditor": "none",
+  "editor.linkedEditing": true,
+  "files.trimTrailingWhitespace": true,
+  "editor.bracketPairColorization.enabled": false,
+  "editor.guides.bracketPairs": false,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "emmet.showExpandedAbbreviation": "never",
+  "emmet.excludeLanguages": ["markdown", "typescript", "javascript"],
+  "javascript.autoClosingTags": false,
+  "typescript.autoClosingTags": false,
+  "cSpell.language": "en, ru",
+
+  // Neovim setup
+  "extensions.experimental.affinity": {
+    "asvetliakov.vscode-neovim": 1
+  },
+  "window.menuBarVisibility": "compact",
+  "window.customTitleBarVisibility": "auto",
+  "editor.formatOnSave": true,
+  "vscode-neovim.neovimInitVimPaths.linux": "~/.config/nvim/vs_code_nvim.init.lua",
+  "[lua]": {
+    "editor.defaultFormatter": "sumneko.lua"
+  },
+  "html.autoClosingTags": false,
+  "workbench.colorTheme": "Nord",
+  "javascript.updateImportsOnFileMove.enabled": "always",
+  "cSpell.userWords": ["notistack"]
+}
