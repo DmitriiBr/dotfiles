@@ -9,10 +9,17 @@ return {
 
 		require("oil").setup({
 			keymaps = {
-				["C-h"] = false,
-				["M-h"] = "actions.select_split",
+				["<C-h>"] = false,
+				["<C-l>"] = false,
+				["<M-l>"] = "actions.refresh",
+				["<M-h>"] = {
+					"actions.select",
+					opts = { horizontal = true },
+					desc = "Open the entry in a vertical split",
+				},
 			},
 			default_file_explorer = true,
+			use_default_keymaps = true,
 			view_options = {
 				show_hidden = true,
 				is_always_hidden = function(name, _)

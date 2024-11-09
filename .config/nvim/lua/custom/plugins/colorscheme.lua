@@ -1,5 +1,5 @@
 -- If you want to see what colorschemes are already installed, you can use `:Telescope colorscheme`.
-return {
+local ROSE_PINE = {
 	"rose-pine/neovim",
 	priority = 1000, -- Make sure to load this before all the other start plugins.
 	name = "rose-pine",
@@ -19,6 +19,38 @@ return {
 				transparency = true,
 				italic = false,
 			},
+			highlight_groups = {
+				CursorLine = { bg = "none" },
+			},
 		})
 	end,
 }
+
+local GITHUB = {
+	"projekt0n/github-nvim-theme",
+	name = "github-theme",
+	lazy = false, -- make sure we load this during startup if it is your main colorscheme
+	priority = 1000, -- make sure to load this before all the other start plugins
+	config = function()
+		require("github-theme").setup({
+			options = {
+				styles = {
+					comments = "NONE", -- Value is any valid attr-list value `:help attr-list`
+					functions = "bold",
+					keywords = "NONE",
+					variables = "bold",
+					conditionals = "NONE",
+					constants = "bold",
+					numbers = "NONE",
+					operators = "NONE",
+					strings = "NONE",
+					types = "bold",
+				},
+			},
+		})
+
+		vim.cmd("colorscheme github_light_default")
+	end,
+}
+
+return GITHUB

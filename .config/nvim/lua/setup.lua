@@ -71,10 +71,15 @@ vim.opt.splitbelow = true
 vim.opt.inccommand = "split"
 
 -- show which line your cursor is on
-vim.opt.cursorline = false
+vim.opt.cursorline = true
 
 -- minimal number of screen lines to keep above and below the cursor.
 vim.opt.scrolloff = 10
+
+-- text width and wrappinglines
+vim.opt.textwidth = 0
+vim.opt.wrapmargin = 0
+vim.opt.wrap = false
 
 -- [[ basic keymaps ]]
 --  see `:help vim.keymap.set()`
