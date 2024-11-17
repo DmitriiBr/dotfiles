@@ -19,6 +19,7 @@
 (setq display-line-numbers 'relative)
 
 (setq make-backup-files nil)
+(setq inhibit-startup-screen t)
 
 (global-auto-revert-mode t)
 
@@ -46,7 +47,6 @@
   :ensure t
   :custom
   (reverse-im-input-methods '("russian-computer"))
-  ;; (reverse-im-activate "ukrainian-computer") ; the legacy way
   :config
   (reverse-im-mode t))
 
@@ -82,6 +82,20 @@
 (use-package magit
   :ensure t
   :init)
+
+(use-package projectile
+  :ensure t
+  :demand t
+  :init
+  :config
+  (projectile-mode +1))
+
+(setq projectile-completion-system 'ivy)
+
+;; Keymaps for projectile
+(global-set-key (kbd "C-x p f") 'projectile-find-file)
+(global-set-key (kbd "C-x p d") 'projectile-find-dir)
+
 
 (use-package exec-path-from-shell
   :config (exec-path-from-shell-initialize))
@@ -192,7 +206,7 @@
  '(custom-safe-themes
    '("e13beeb34b932f309fb2c360a04a460821ca99fe58f69e65557d6c1b10ba18c7" default))
  '(package-selected-packages
-   '(doom-modeline counsel ocaml-ts-mode lsp-ui smex lsp-mode helm-ls-git helm-git-grep helm exec-path-from-shell company flycheck-inline add-node-modules-path apheleia eslint-rc flycheck tree-sitter-langs tree-sitter gruber-darker-theme typescript-mode ivy)))
+   '(projectile doom-modeline counsel ocaml-ts-mode lsp-ui smex lsp-mode helm-ls-git helm-git-grep helm exec-path-from-shell company flycheck-inline add-node-modules-path apheleia eslint-rc flycheck tree-sitter-langs tree-sitter gruber-darker-theme typescript-mode ivy)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
