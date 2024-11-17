@@ -21,6 +21,13 @@
 (setq make-backup-files nil)
 (setq inhibit-startup-screen t)
 
+;; Truncate lines everywhere (Like in average editors)
+(setq-default truncate-lines t)
+(setq-default gloabal-visual-mode t)
+
+(setq-default indent-tabs-mode nil)
+(setq-default tab-width 4)
+
 (global-auto-revert-mode t)
 
 (set-face-attribute 'default nil :height 160)
@@ -28,16 +35,16 @@
 
 ;;' Insert new line below current line
 (global-set-key (kbd "<C-return>") (lambda ()
-				     (interactive)
-				     (end-of-line)
-				     (newline-and-indent)))
+				                     (interactive)
+				                     (end-of-line)
+				                     (newline-and-indent)))
 
 ;; Insert new line above current line
 (global-set-key (kbd "<C-S-return>") (lambda ()
-				       (interactive)
-				       (previous-line)
-				       (end-of-line)
-				       (newline-and-indent)))
+				                       (interactive)
+				                       (previous-line)
+				                       (end-of-line)
+				                       (newline-and-indent)))
 
 (ido-mode 1)
 (setq ido-separator "\n")
@@ -126,24 +133,24 @@
          ("\\.cjs\\'" . typescript-ts-mode)
          ("\\.ts\\'"  . typescript-ts-mode)
          ("\\.jsx\\'" . tsx-ts-mode)
-	 ("\\.ml\\'" . ocaml-ts-mode)
-	 ("\\.mli\\'" . ocaml-ts-mode)))
+	     ("\\.ml\\'" . ocaml-ts-mode)
+	     ("\\.mli\\'" . ocaml-ts-mode)))
 
 ;; You need this mappings to add language-grammars to treesit list and install them
 ;; You can call list for installation using M-x treesit-install-language-grammar
 (setq treesit-language-source-alist
       '(
-	(cmake "https://github.com/uyha/tree-sitter-cmake")
-	(css "https://github.com/tree-sitter/tree-sitter-css")
-	(elisp "https://github.com/Wilfred/tree-sitter-elisp")
-	(go "https://github.com/tree-sitter/tree-sitter-go")
-	(html "https://github.com/tree-sitter/tree-sitter-html")
-	(javascript "https://github.com/tree-sitter/tree-sitter-javascript" "master" "src")
-	(json "https://github.com/tree-sitter/tree-sitter-json")
-	(markdown "https://github.com/ikatyang/tree-sitter-markdown")
-	(toml "https://github.com/tree-sitter/tree-sitter-toml")
-	(tsx "https://github.com/tree-sitter/tree-sitter-typescript" "master" "tsx/src")
-	(typescript "https://github.com/tree-sitter/tree-sitter-typescript" "master" "typescript/src")
+	    (cmake "https://github.com/uyha/tree-sitter-cmake")
+	    (css "https://github.com/tree-sitter/tree-sitter-css")
+	    (elisp "https://github.com/Wilfred/tree-sitter-elisp")
+	    (go "https://github.com/tree-sitter/tree-sitter-go")
+	    (html "https://github.com/tree-sitter/tree-sitter-html")
+	    (javascript "https://github.com/tree-sitter/tree-sitter-javascript" "master" "src")
+	    (json "https://github.com/tree-sitter/tree-sitter-json")
+	    (markdown "https://github.com/ikatyang/tree-sitter-markdown")
+	    (toml "https://github.com/tree-sitter/tree-sitter-toml")
+	    (tsx "https://github.com/tree-sitter/tree-sitter-typescript" "master" "tsx/src")
+	    (typescript "https://github.com/tree-sitter/tree-sitter-typescript" "master" "typescript/src")
         (ocaml "https://github.com/tree-sitter/tree-sitter-ocaml" "master" "grammars/ocaml/src")))
 
 (use-package eslint-rc
@@ -171,8 +178,20 @@
   :demand t
   :config
   (global-flycheck-mode)
+  :custom
+  (setq flycheck-auto-display-errors-after-checking nil)
   (with-eval-after-load 'flycheck
     (add-hook 'flycheck-mode-hook #'flycheck-inline-mode)))
+
+(use-package flycheck-posframe
+  :ensure t
+  :after flycheck
+  :config (add-hook 'flycheck-mode-hook #'flycheck-posframe-mode))
+
+(setq flycheck-posframe-warning-prefix " \uea87 ")
+(setq flycheck-posframe-error-prefix " \uea6c ")
+(setq flycheck-posframe-border-width 1)
+(setq flycheck-posframe-border-use-error-face t)
 
 ;; Setting up an LSP mode
 (use-package lsp-mode
@@ -181,13 +200,28 @@
   (setq lsp-enable-on-type-formatting nil)
   (setq lsp-log-io nil)
   (setq lsp-headerline-breadcrumb-enable nil)  ; Optional, I like the breadcrumbs
+  (setq lsp-eldoc-enable-hover t)
+  (setq lsp-enable-indentation nil)
+  (setq lsp-enable-text-document-color nil)
+  (setq lsp-headerline-breadcrumb-enable nil)  ; Optional, I like the breadcrumbs
+  (setq lsp-semantic-tokens-enable nil)
+  (setq lsp-signature-render-documentation nil)
+  (setq lsp-signature-auto-activate nil) ;; you could manually request them via `lsp-signature-activate`
   :hook
   (tsx-ts-mode . lsp)
   (typescript-ts-mode . lsp)
   (js-ts-mode . lsp)
   :commands lsp)
 
-(use-package lsp-ui :commands lsp-ui-mode)
+(use-package lsp-ui
+  :init
+  (setq lsp-ui-sideline-show-hover nil)
+  (setq lsp-ui-doc-enable t)
+  (setq lsp-ui-doc-position 'at-point)
+  (setq lsp-ui-doc-max-width 70)
+  (setq lsp-ui-sideline-enable nil)
+  (setq lsp-ui-sideline-show-code-actions nil)
+  :commands lsp-ui-mode)
 
 (use-package doom-modeline
   :ensure t
@@ -206,7 +240,7 @@
  '(custom-safe-themes
    '("e13beeb34b932f309fb2c360a04a460821ca99fe58f69e65557d6c1b10ba18c7" default))
  '(package-selected-packages
-   '(projectile doom-modeline counsel ocaml-ts-mode lsp-ui smex lsp-mode helm-ls-git helm-git-grep helm exec-path-from-shell company flycheck-inline add-node-modules-path apheleia eslint-rc flycheck tree-sitter-langs tree-sitter gruber-darker-theme typescript-mode ivy)))
+   '(flycheck-posframe projectile doom-modeline counsel ocaml-ts-mode lsp-ui smex lsp-mode helm-ls-git helm-git-grep helm exec-path-from-shell company flycheck-inline add-node-modules-path apheleia eslint-rc flycheck tree-sitter-langs tree-sitter gruber-darker-theme typescript-mode ivy)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
