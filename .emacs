@@ -1,4 +1,4 @@
-(require 'package)
+es(require 'package)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
 ;; Comment/uncomment this line to enable MELPA Stable if desired.  See `package-archive-priorities`
 ;; and `package-pinned-packages`. Most users will not need or want to do this.
@@ -35,16 +35,16 @@
 
 ;;' Insert new line below current line
 (global-set-key (kbd "<C-return>") (lambda ()
-				                     (interactive)
-				                     (end-of-line)
-				                     (newline-and-indent)))
+                                     (interactive)
+                                     (end-of-line)
+                                     (newline-and-indent)))
 
 ;; Insert new line above current line
 (global-set-key (kbd "<C-S-return>") (lambda ()
-				                       (interactive)
-				                       (previous-line)
-				                       (end-of-line)
-				                       (newline-and-indent)))
+                                       (interactive)
+                                       (previous-line)
+                                       (end-of-line)
+                                       (newline-and-indent)))
 
 (ido-mode 1)
 (setq ido-separator "\n")
@@ -133,24 +133,24 @@
          ("\\.cjs\\'" . typescript-ts-mode)
          ("\\.ts\\'"  . typescript-ts-mode)
          ("\\.jsx\\'" . tsx-ts-mode)
-	     ("\\.ml\\'" . ocaml-ts-mode)
-	     ("\\.mli\\'" . ocaml-ts-mode)))
+         ("\\.ml\\'" . ocaml-ts-mode)
+         ("\\.mli\\'" . ocaml-ts-mode)))
 
 ;; You need this mappings to add language-grammars to treesit list and install them
 ;; You can call list for installation using M-x treesit-install-language-grammar
 (setq treesit-language-source-alist
       '(
-	    (cmake "https://github.com/uyha/tree-sitter-cmake")
-	    (css "https://github.com/tree-sitter/tree-sitter-css")
-	    (elisp "https://github.com/Wilfred/tree-sitter-elisp")
-	    (go "https://github.com/tree-sitter/tree-sitter-go")
-	    (html "https://github.com/tree-sitter/tree-sitter-html")
-	    (javascript "https://github.com/tree-sitter/tree-sitter-javascript" "master" "src")
-	    (json "https://github.com/tree-sitter/tree-sitter-json")
-	    (markdown "https://github.com/ikatyang/tree-sitter-markdown")
-	    (toml "https://github.com/tree-sitter/tree-sitter-toml")
-	    (tsx "https://github.com/tree-sitter/tree-sitter-typescript" "master" "tsx/src")
-	    (typescript "https://github.com/tree-sitter/tree-sitter-typescript" "master" "typescript/src")
+        (cmake "https://github.com/uyha/tree-sitter-cmake")
+        (css "https://github.com/tree-sitter/tree-sitter-css")
+        (elisp "https://github.com/Wilfred/tree-sitter-elisp")
+        (go "https://github.com/tree-sitter/tree-sitter-go")
+        (html "https://github.com/tree-sitter/tree-sitter-html")
+        (javascript "https://github.com/tree-sitter/tree-sitter-javascript" "master" "src")
+        (json "https://github.com/tree-sitter/tree-sitter-json")
+        (markdown "https://github.com/ikatyang/tree-sitter-markdown")
+        (toml "https://github.com/tree-sitter/tree-sitter-toml")
+        (tsx "https://github.com/tree-sitter/tree-sitter-typescript" "master" "tsx/src")
+        (typescript "https://github.com/tree-sitter/tree-sitter-typescript" "master" "typescript/src")
         (ocaml "https://github.com/tree-sitter/tree-sitter-ocaml" "master" "grammars/ocaml/src")))
 
 (use-package eslint-rc
