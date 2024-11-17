@@ -99,8 +99,10 @@
     (global-tree-sitter-mode)
     (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode)))
 
-;; Setting indentation for ts tsx and js to 4
+;; Setting indentation for ts, js, tsx, js, ocaml to 4
 (setq typescript-ts-mode-indent-offset 4)
+(setq tsx-ts-mode-indent-offset 4)
+(setq ocaml-ts-mode-indent-offset 4)
 
 (use-package treesit
   :mode (("\\.tsx\\'" . tsx-ts-mode)
@@ -173,6 +175,14 @@
 
 (use-package lsp-ui :commands lsp-ui-mode)
 
+(use-package doom-modeline
+  :ensure t
+  :hook (after-init . doom-modeline-mode))
+
+(setq doom-modeline-hud nil)
+(setq doom-modeline-buffer-encoding nil)
+(setq nerd-icons-scale-factor 1)
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -182,7 +192,7 @@
  '(custom-safe-themes
    '("e13beeb34b932f309fb2c360a04a460821ca99fe58f69e65557d6c1b10ba18c7" default))
  '(package-selected-packages
-   '(counsel ocaml-ts-mode lsp-ui smex lsp-mode helm-ls-git helm-git-grep helm exec-path-from-shell company flycheck-inline add-node-modules-path apheleia eslint-rc flycheck tree-sitter-langs tree-sitter gruber-darker-theme typescript-mode ivy)))
+   '(doom-modeline counsel ocaml-ts-mode lsp-ui smex lsp-mode helm-ls-git helm-git-grep helm exec-path-from-shell company flycheck-inline add-node-modules-path apheleia eslint-rc flycheck tree-sitter-langs tree-sitter gruber-darker-theme typescript-mode ivy)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
