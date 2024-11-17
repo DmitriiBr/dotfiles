@@ -64,6 +64,21 @@
   :config
   (ivy-mode +1))
 
+(use-package counsel
+  :ensure t
+  :demand t
+  :init
+  :config
+  (counsel-mode +1))
+
+;; Consel for searching with ivy
+(global-set-key (kbd "M-x") 'counsel-M-x)
+(global-set-key (kbd "C-x C-f") 'counsel-find-file)
+;; Finding file in git repo
+(global-set-key (kbd "C-c g") 'counsel-git)
+;; Finding Occurance in git repo
+(global-set-key (kbd "C-c j") 'counsel-git-grep)
+
 (use-package magit
   :ensure t
   :init)
@@ -167,10 +182,12 @@
  '(custom-safe-themes
    '("e13beeb34b932f309fb2c360a04a460821ca99fe58f69e65557d6c1b10ba18c7" default))
  '(package-selected-packages
-   '(ocaml-ts-mode lsp-ui smex lsp-mode helm-ls-git helm-git-grep helm exec-path-from-shell company flycheck-inline add-node-modules-path apheleia eslint-rc flycheck tree-sitter-langs tree-sitter gruber-darker-theme typescript-mode ivy)))
+   '(counsel ocaml-ts-mode lsp-ui smex lsp-mode helm-ls-git helm-git-grep helm exec-path-from-shell company flycheck-inline add-node-modules-path apheleia eslint-rc flycheck tree-sitter-langs tree-sitter gruber-darker-theme typescript-mode ivy)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- )
+ '(flycheck-error ((t (:underline (:color "Red1" :style line :position 0)))))
+ '(flycheck-info ((t (:underline (:color "ForestGreen" :style line :position 0)))))
+ '(flycheck-warning ((t (:underline (:color "DarkOrange" :style line :position 0))))))
