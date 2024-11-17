@@ -25,41 +25,6 @@
 (set-face-attribute 'default nil :height 160)
 (set-face-attribute 'default nil :font "MesloLGS Nerd Font" :height 160)
 
-(use-package smex)
-
-(use-package ivy
-  :ensure t
-  :init
-  :bind
-  (("C-c C-r" . ivy-resume)
-   ("C-x B" . ivy-switch-buffer-other-window))
-  :custom
-  (setq ivy-use-virtual-buffers t)
-  (setq enable-recursive-minibuffers t)
-  (setq ivy-count-format "(%d/%d) ")
-  :config
-  (ivy-mode +1)
-  (ivy-resume))
-
-(ido-mode 1)
-(setq ido-separator "\n")
-(ido-everywhere 1)
-
-(global-set-key (kbd "M-x") 'smex)
-(global-set-key (kbd "M-X") 'smex-major-mode-commands)
-
-(use-package helm)
-(use-package helm-ls-git)
-
-(setq helm-ff-transformer-show-only-basename nil)
-
-(global-set-key (kbd "C-c h t") 'helm-cmd-t)
-;; (global-set-key (kbd "C-c h g g") 'helm-git-grep)
-(global-set-key (kbd "C-c h g l") 'helm-ls-git-ls)
-(global-set-key (kbd "C-c h f") 'helm-find)
-(global-set-key (kbd "C-c h a") 'helm-org-agenda-files-headings)
-(global-set-key (kbd "C-c h r") 'helm-recentf)
-
 ;;' Insert new line below current line
 (global-set-key (kbd "<C-return>") (lambda ()
 				     (interactive)
@@ -72,6 +37,36 @@
 				       (previous-line)
 				       (end-of-line)
 				       (newline-and-indent)))
+
+(ido-mode 1)
+(setq ido-separator "\n")
+(ido-everywhere 1)
+
+(use-package reverse-im
+  :ensure t
+  :custom
+  (reverse-im-input-methods '("russian-computer"))
+  ;; (reverse-im-activate "ukrainian-computer") ; the legacy way
+  :config
+  (reverse-im-mode t))
+
+(use-package ivy
+  :ensure t
+  :demand t
+  :init
+  :bind
+  (("C-c C-r" . ivy-resume)
+   ("C-x B" . ivy-switch-buffer-other-window))
+  :custom
+  (setq ivy-use-virtual-buffers t)
+  (setq enable-recursive-minibuffers t)
+  (setq ivy-count-format "(%d/%d) ")
+  :config
+  (ivy-mode +1))
+
+(use-package magit
+  :ensure t
+  :init)
 
 (use-package exec-path-from-shell
   :config (exec-path-from-shell-initialize))
@@ -129,17 +124,20 @@
 ;; https://github.com/radian-software/aphelei
 (use-package apheleia
   :ensure t
+  :demand t
   :config
   ;; You always should get prettier from formatters list and call prettiern bin to format buffer
   (setf (alist-get 'prettier apheleia-formatters)
         '(npx "prettier" "--stdin-filepath" filepath))
   ;; Here prettier is connecting to modes
   (add-to-list 'apheleia-mode-alist '(tsx-ts-mode . prettier))
+  (add-to-list 'apheleia-mode-alist '(typescript-ts-mode . prettier))
+  (add-to-list 'apheleia-mode-alist '(js-ts-mode . prettier))
   (apheleia-global-mode +1))
 
 (use-package flycheck
   :ensure t
-  :defer t
+  :demand t
   :config
   (global-flycheck-mode)
   (with-eval-after-load 'flycheck
