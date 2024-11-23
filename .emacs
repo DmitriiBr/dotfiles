@@ -237,12 +237,44 @@
 ;; Lsp end
 
 (use-package doom-modeline
-  :ensure t
-  :hook (after-init . doom-modeline-mode))
+  :config
+  (doom-modeline-def-modeline 'my-simple-line
+    '(bar buffer-info-simple matches selection-info)
+    '(process buffer-position))
+  ;; Set default mode-line
+  (add-hook 'doom-modeline-mode-hook
+            (lambda ()
+              (doom-modeline-set-modeline 'my-simple-line 'default)))
+  ;; Configure other mode-lines based on major modes
+  (add-to-list 'doom-modeline-mode-alist '(my-mode . my-simple-line))
+  )
 
-(setq doom-modeline-hud nil)
+(setq doom-modeline-icon t)
+(setq doom-modeline-buffer-modification-icon t)
+(setq doom-modeline-major-mode-icon nil)
 (setq doom-modeline-buffer-encoding nil)
-(setq nerd-icons-scale-factor 1)
+(setq doom-modeline-time nil)
+(setq doom-modeline-vcs-icon nil)
+(setq doom-modeline-height 36)
+
+
+;; Mood line start
+(use-package mood-line
+  :ensure t
+  :config
+  (mood-line-mode)
+  ;; Custom format:
+  (setq mood-line-glyph-alist mood-line-glyphs-fira-code)
+  (setq mood-line-format
+        (mood-line-defformat
+         :left
+         (((mood-line-segment-buffer-status) . " ")
+          ((mood-line-segment-buffer-name)   . ""))
+         :right
+         (((mood-line-segment-scroll)             . " ")
+          ((mood-line-segment-cursor-position)    . "  ")))))
+;; Mood line end
+
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
@@ -253,7 +285,7 @@
  '(custom-safe-themes
    '("c0aa9e26715866404ac854a1023a177742b41a3a6b0fdbfe68d9f5414e24e170" "e13beeb34b932f309fb2c360a04a460821ca99fe58f69e65557d6c1b10ba18c7" default))
  '(package-selected-packages
-   '(move-text evil flycheck-posframe projectile doom-modeline counsel ocaml-ts-mode lsp-ui smex lsp-mode helm-ls-git helm-git-grep helm exec-path-from-shell company flycheck-inline add-node-modules-path apheleia eslint-rc flycheck tree-sitter-langs tree-sitter gruber-darker-theme typescript-mode ivy)))
+   '(mood-line doom-modeline move-text evil flycheck-posframe projectile counsel ocaml-ts-mode lsp-ui smex lsp-mode helm-ls-git helm-git-grep helm exec-path-from-shell company flycheck-inline add-node-modules-path apheleia eslint-rc flycheck tree-sitter-langs tree-sitter gruber-darker-theme typescript-mode ivy)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -261,4 +293,7 @@
  ;; If there is more than one, they won't work right.
  '(flycheck-error ((t (:underline (:color "Red1" :style line :position 0)))))
  '(flycheck-info ((t (:underline (:color "ForestGreen" :style line :position 0)))))
- '(flycheck-warning ((t (:underline (:color "DarkOrange" :style line :position 0))))))
+ '(flycheck-warning ((t (:underline (:color "DarkOrange" :style line :position 0)))))
+ '(mode-line ((t (:background "#e8e8e8" :foreground "black" :box (:line-width (1 . 8) :color "#e8e8e8" :style flat-button)))))
+ '(mode-line-inactive ((t (:inherit mode-line :background "#f5f5f5" :foreground "grey20"))))
+ '(simple-modeline-status-modified ((t (:inherit font-lock-variable-name-face)))))
