@@ -1,4 +1,4 @@
-es(require 'package)
+(require 'package)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
 ;; Comment/uncomment this line to enable MELPA Stable if desired.  See `package-archive-priorities`
 ;; and `package-pinned-packages`. Most users will not need or want to do this.
@@ -15,8 +15,10 @@ es(require 'package)
 (show-paren-mode 1)
 
 ;; Line numbers
-(global-display-line-numbers-mode)
+(global-display-line-numbers-mode nil)
 (setq display-line-numbers 'relative)
+
+(add-to-list 'custom-theme-load-path "~/.emacs.d/etc/themes")
 
 (setq make-backup-files nil)
 (setq inhibit-startup-screen t)
@@ -46,9 +48,17 @@ es(require 'package)
                                        (end-of-line)
                                        (newline-and-indent)))
 
+(use-package move-text
+  :ensure t
+  :demand t
+  :init
+  :config
+  (global-set-key (kbd "M-p") 'move-text-up)
+  (global-set-key (kbd "M-n") 'move-text-down))
+
 (ido-mode 1)
-(setq ido-separator "\n")
 (ido-everywhere 1)
+(setq ido-separator "\n")
 
 (use-package reverse-im
   :ensure t
@@ -176,22 +186,19 @@ es(require 'package)
 (use-package flycheck
   :ensure t
   :demand t
-  :config
-  (global-flycheck-mode)
   :custom
   (setq flycheck-auto-display-errors-after-checking nil)
+  :config
+  (global-flycheck-mode)
   (with-eval-after-load 'flycheck
     (add-hook 'flycheck-mode-hook #'flycheck-inline-mode)))
 
-(use-package flycheck-posframe
-  :ensure t
-  :after flycheck
-  :config (add-hook 'flycheck-mode-hook #'flycheck-posframe-mode))
-
-(setq flycheck-posframe-warning-prefix " \uea87 ")
-(setq flycheck-posframe-error-prefix " \uea6c ")
-(setq flycheck-posframe-border-width 1)
-(setq flycheck-posframe-border-use-error-face t)
+;; Lsp start
+(defun add-lsp-hooks (lsp)
+  "Add lsp-mode for this major modes."
+  (tsx-ts-mode . lsp)
+  (typescript-ts-mode . lsp)
+  (js-ts-mode . lsp))
 
 ;; Setting up an LSP mode
 (use-package lsp-mode
@@ -199,18 +206,22 @@ es(require 'package)
   (setq lsp-keymap-prefix "C-c l")
   (setq lsp-enable-on-type-formatting nil)
   (setq lsp-log-io nil)
+  (setq lsp-enable-symbol-highlighting nil)
   (setq lsp-headerline-breadcrumb-enable nil)  ; Optional, I like the breadcrumbs
-  (setq lsp-eldoc-enable-hover t)
+  (setq lsp-eldoc-enable-hover nil)
   (setq lsp-enable-indentation nil)
   (setq lsp-enable-text-document-color nil)
   (setq lsp-headerline-breadcrumb-enable nil)  ; Optional, I like the breadcrumbs
   (setq lsp-semantic-tokens-enable nil)
   (setq lsp-signature-render-documentation nil)
   (setq lsp-signature-auto-activate nil) ;; you could manually request them via `lsp-signature-activate`
-  :hook
-  (tsx-ts-mode . lsp)
-  (typescript-ts-mode . lsp)
-  (js-ts-mode . lsp)
+  (setq lsp-modeline-code-actions-enable nil)
+  (setq lsp-eldoc-enable-hover nil)
+  (setq lsp-modeline-diagnostics-enable nil)
+  (setq lsp-signature-auto-activate nil)
+  (setq lsp-signature-render-documentation nil)
+  (setq lsp-completion-provider :none)
+  ;; Not adding now :hook (add-lsp-hooks lsp)
   :commands lsp)
 
 (use-package lsp-ui
@@ -220,8 +231,10 @@ es(require 'package)
   (setq lsp-ui-doc-position 'at-point)
   (setq lsp-ui-doc-max-width 70)
   (setq lsp-ui-sideline-enable nil)
+  (setq lsp-ui-sideline-show-hover nil)
   (setq lsp-ui-sideline-show-code-actions nil)
   :commands lsp-ui-mode)
+;; Lsp end
 
 (use-package doom-modeline
   :ensure t
@@ -236,11 +249,11 @@ es(require 'package)
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(custom-enabled-themes '(gruber-darker))
+ '(custom-enabled-themes '(alabaster))
  '(custom-safe-themes
-   '("e13beeb34b932f309fb2c360a04a460821ca99fe58f69e65557d6c1b10ba18c7" default))
+   '("c0aa9e26715866404ac854a1023a177742b41a3a6b0fdbfe68d9f5414e24e170" "e13beeb34b932f309fb2c360a04a460821ca99fe58f69e65557d6c1b10ba18c7" default))
  '(package-selected-packages
-   '(flycheck-posframe projectile doom-modeline counsel ocaml-ts-mode lsp-ui smex lsp-mode helm-ls-git helm-git-grep helm exec-path-from-shell company flycheck-inline add-node-modules-path apheleia eslint-rc flycheck tree-sitter-langs tree-sitter gruber-darker-theme typescript-mode ivy)))
+   '(move-text evil flycheck-posframe projectile doom-modeline counsel ocaml-ts-mode lsp-ui smex lsp-mode helm-ls-git helm-git-grep helm exec-path-from-shell company flycheck-inline add-node-modules-path apheleia eslint-rc flycheck tree-sitter-langs tree-sitter gruber-darker-theme typescript-mode ivy)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
