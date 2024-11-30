@@ -11,16 +11,18 @@
 (menu-bar-mode -1)
 (tool-bar-mode -1)
 
+(desktop-save-mode 1)
+
 (column-number-mode 1)
 (show-paren-mode 1)
 
 ;; Line numbers
-(global-display-line-numbers-mode nil)
-(setq display-line-numbers 'relative)
+(setq display-line-numbers-type 'relative)
+(global-display-line-numbers-mode -1)
 
 (add-to-list 'custom-theme-load-path "~/.emacs.d/etc/themes")
 
-(setq make-backup-files nil)
+(setq make-backup-files -1)
 (setq inhibit-startup-screen t)
 
 ;; Truncate lines everywhere (Like in average editors)
@@ -29,11 +31,28 @@
 
 (setq-default indent-tabs-mode nil)
 (setq-default tab-width 4)
-
 (global-auto-revert-mode t)
 
-(set-face-attribute 'default nil :height 160)
-(set-face-attribute 'default nil :font "MesloLGS Nerd Font" :height 160)
+
+
+;; Setting font
+(defun set-font (index)
+  ;; Choosing font family into local variable
+  (let ((font-from-list
+         (nth index '("MesloLGS Nerd Font" "PragmataPro"))))
+    ;; Choosing heigth into local variable
+    (let ((height-from-list
+           (nth index '(160 180))))
+      ;; Setting default face-attribute
+      (set-face-attribute 'default nil :font font-from-list :height height-from-list))))
+
+(set-font 1)
+;; Setting font end
+
+
+
+;; Kill buffers instantly
+(global-set-key (kbd "C-x k") 'kill-this-buffer)
 
 ;;' Insert new line below current line
 (global-set-key (kbd "<C-return>") (lambda ()
@@ -56,6 +75,8 @@
   (global-set-key (kbd "M-p") 'move-text-up)
   (global-set-key (kbd "M-n") 'move-text-down))
 
+
+;; Searching, Ido + ivy + counsel
 (ido-mode 1)
 (ido-everywhere 1)
 (setq ido-separator "\n")
@@ -96,6 +117,8 @@
 ;; Finding Occurance in git repo
 (global-set-key (kbd "C-c j") 'counsel-git-grep)
 
+;; Searching, Ido + ivy + counsel End
+
 (use-package magit
   :ensure t
   :init)
@@ -114,58 +137,33 @@
 (global-set-key (kbd "C-x p d") 'projectile-find-dir)
 
 
+;; Misc
 (use-package exec-path-from-shell
   :config (exec-path-from-shell-initialize))
-
 (use-package add-node-modules-path
   :ensure t
   :init)
+(use-package eslint-fix)
 
-(use-package tree-sitter
-  :ensure t
+;; Modes
+(use-package markdown-mode)
+
+(use-package typescript-mode
   :config
-  (use-package tree-sitter-langs
-    :ensure t
-    :config
-    (global-tree-sitter-mode)
-    (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode)))
+  (add-hook 'typescript-mode-hook (lambda () (typescript-mode 1))))
 
-;; Setting indentation for ts, js, tsx, js, ocaml to 4
-(setq typescript-ts-mode-indent-offset 4)
-(setq tsx-ts-mode-indent-offset 4)
-(setq ocaml-ts-mode-indent-offset 4)
+(use-package web-mode
+  :config
+  (add-to-list 'auto-mode-alist '("\\.jsx\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.tsx\\'" . web-mode)))
 
-(use-package treesit
-  :mode (("\\.tsx\\'" . tsx-ts-mode)
-         ("\\.js\\'"  . typescript-ts-mode)
-         ("\\.mjs\\'" . typescript-ts-mode)
-         ("\\.mts\\'" . typescript-ts-mode)
-         ("\\.cjs\\'" . typescript-ts-mode)
-         ("\\.ts\\'"  . typescript-ts-mode)
-         ("\\.jsx\\'" . tsx-ts-mode)
-         ("\\.ml\\'" . ocaml-ts-mode)
-         ("\\.mli\\'" . ocaml-ts-mode)))
+(use-package js2-mode)
 
-;; You need this mappings to add language-grammars to treesit list and install them
-;; You can call list for installation using M-x treesit-install-language-grammar
-(setq treesit-language-source-alist
-      '(
-        (cmake "https://github.com/uyha/tree-sitter-cmake")
-        (css "https://github.com/tree-sitter/tree-sitter-css")
-        (elisp "https://github.com/Wilfred/tree-sitter-elisp")
-        (go "https://github.com/tree-sitter/tree-sitter-go")
-        (html "https://github.com/tree-sitter/tree-sitter-html")
-        (javascript "https://github.com/tree-sitter/tree-sitter-javascript" "master" "src")
-        (json "https://github.com/tree-sitter/tree-sitter-json")
-        (markdown "https://github.com/ikatyang/tree-sitter-markdown")
-        (toml "https://github.com/tree-sitter/tree-sitter-toml")
-        (tsx "https://github.com/tree-sitter/tree-sitter-typescript" "master" "tsx/src")
-        (typescript "https://github.com/tree-sitter/tree-sitter-typescript" "master" "typescript/src")
-        (ocaml "https://github.com/tree-sitter/tree-sitter-ocaml" "master" "grammars/ocaml/src")))
-
-(use-package eslint-rc
+(use-package tuareg
   :ensure t
-  :init)
+  :demand t
+  :init
+  :hook (electric-indent-mode nil))
 
 ;;; APHELEIA
 ;; auto-format different source code files extremely intelligently
@@ -178,85 +176,11 @@
   (setf (alist-get 'prettier apheleia-formatters)
         '(npx "prettier" "--stdin-filepath" filepath))
   ;; Here prettier is connecting to modes
+  (add-to-list 'apheleia-mode-alist '(typescript-mode . prettier))
+  (add-to-list 'apheleia-mode-alist '(web-mode . prettier))
   (add-to-list 'apheleia-mode-alist '(tsx-ts-mode . prettier))
-  (add-to-list 'apheleia-mode-alist '(typescript-ts-mode . prettier))
   (add-to-list 'apheleia-mode-alist '(js-ts-mode . prettier))
   (apheleia-global-mode +1))
-
-(use-package flycheck
-  :ensure t
-  :demand t
-  :custom
-  (setq flycheck-auto-display-errors-after-checking nil)
-  :config
-  (global-flycheck-mode)
-  (with-eval-after-load 'flycheck
-    (add-hook 'flycheck-mode-hook #'flycheck-inline-mode)))
-
-;; Lsp start
-(defun add-lsp-hooks (lsp)
-  "Add lsp-mode for this major modes."
-  (tsx-ts-mode . lsp)
-  (typescript-ts-mode . lsp)
-  (js-ts-mode . lsp))
-
-;; Setting up an LSP mode
-(use-package lsp-mode
-  :init
-  (setq lsp-keymap-prefix "C-c l")
-  (setq lsp-enable-on-type-formatting nil)
-  (setq lsp-log-io nil)
-  (setq lsp-enable-symbol-highlighting nil)
-  (setq lsp-headerline-breadcrumb-enable nil)  ; Optional, I like the breadcrumbs
-  (setq lsp-eldoc-enable-hover nil)
-  (setq lsp-enable-indentation nil)
-  (setq lsp-enable-text-document-color nil)
-  (setq lsp-headerline-breadcrumb-enable nil)  ; Optional, I like the breadcrumbs
-  (setq lsp-semantic-tokens-enable nil)
-  (setq lsp-signature-render-documentation nil)
-  (setq lsp-signature-auto-activate nil) ;; you could manually request them via `lsp-signature-activate`
-  (setq lsp-modeline-code-actions-enable nil)
-  (setq lsp-eldoc-enable-hover nil)
-  (setq lsp-modeline-diagnostics-enable nil)
-  (setq lsp-signature-auto-activate nil)
-  (setq lsp-signature-render-documentation nil)
-  (setq lsp-completion-provider :none)
-  ;; Not adding now :hook (add-lsp-hooks lsp)
-  :commands lsp)
-
-(use-package lsp-ui
-  :init
-  (setq lsp-ui-sideline-show-hover nil)
-  (setq lsp-ui-doc-enable t)
-  (setq lsp-ui-doc-position 'at-point)
-  (setq lsp-ui-doc-max-width 70)
-  (setq lsp-ui-sideline-enable nil)
-  (setq lsp-ui-sideline-show-hover nil)
-  (setq lsp-ui-sideline-show-code-actions nil)
-  :commands lsp-ui-mode)
-;; Lsp end
-
-(use-package doom-modeline
-  :config
-  (doom-modeline-def-modeline 'my-simple-line
-    '(bar buffer-info-simple matches selection-info)
-    '(process buffer-position))
-  ;; Set default mode-line
-  (add-hook 'doom-modeline-mode-hook
-            (lambda ()
-              (doom-modeline-set-modeline 'my-simple-line 'default)))
-  ;; Configure other mode-lines based on major modes
-  (add-to-list 'doom-modeline-mode-alist '(my-mode . my-simple-line))
-  )
-
-(setq doom-modeline-icon t)
-(setq doom-modeline-buffer-modification-icon t)
-(setq doom-modeline-major-mode-icon nil)
-(setq doom-modeline-buffer-encoding nil)
-(setq doom-modeline-time nil)
-(setq doom-modeline-vcs-icon nil)
-(setq doom-modeline-height 36)
-
 
 ;; Mood line start
 (use-package mood-line
@@ -285,15 +209,17 @@
  '(custom-safe-themes
    '("c0aa9e26715866404ac854a1023a177742b41a3a6b0fdbfe68d9f5414e24e170" "e13beeb34b932f309fb2c360a04a460821ca99fe58f69e65557d6c1b10ba18c7" default))
  '(package-selected-packages
-   '(mood-line doom-modeline move-text evil flycheck-posframe projectile counsel ocaml-ts-mode lsp-ui smex lsp-mode helm-ls-git helm-git-grep helm exec-path-from-shell company flycheck-inline add-node-modules-path apheleia eslint-rc flycheck tree-sitter-langs tree-sitter gruber-darker-theme typescript-mode ivy)))
+   '(js2-mode web-mode tuareg mood-line doom-modeline move-text evil flycheck-posframe projectile counsel ocaml-ts-mode lsp-ui smex lsp-mode helm-ls-git helm-git-grep helm exec-path-from-shell company flycheck-inline add-node-modules-path apheleia flycheck tree-sitter-langs tree-sitter gruber-darker-theme typescript-mode ivy)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(fixed-pitch ((t nil)))
  '(flycheck-error ((t (:underline (:color "Red1" :style line :position 0)))))
  '(flycheck-info ((t (:underline (:color "ForestGreen" :style line :position 0)))))
  '(flycheck-warning ((t (:underline (:color "DarkOrange" :style line :position 0)))))
+ '(markdown-code-face ((t (:inherit fixed-pitch))))
  '(mode-line ((t (:background "#e8e8e8" :foreground "black" :box (:line-width (1 . 8) :color "#e8e8e8" :style flat-button)))))
- '(mode-line-inactive ((t (:inherit mode-line :background "#f5f5f5" :foreground "grey20"))))
+ '(mode-line-inactive ((t (:inherit mode-line :background "#e8e8e8" :foreground "black" :box (:line-width (1 . 10) :color "#e8e8e8")))))
  '(simple-modeline-status-modified ((t (:inherit font-lock-variable-name-face)))))
