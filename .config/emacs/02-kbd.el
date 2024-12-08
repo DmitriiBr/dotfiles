@@ -28,6 +28,14 @@
 ;; Set ESC key to be always quit
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 
+;; Duplicate line and move to next
+(defun duplicate-line-and-next ()
+  (lambda ()
+    (interactive)
+    (duplicate-line)
+    (next-line)))
+(global-set-key (kbd "C-,") (duplicate-line-and-next))
+
 (provide '02-kbd)
 
 ;;; 02-kbd.el ends here

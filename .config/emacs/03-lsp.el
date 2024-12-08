@@ -10,6 +10,11 @@
   "Add lsp-mode for this major modes."
   (tuareg-mode . lsp))
 
+(use-package flymake
+  :ensure t
+  :init
+  :config (flymake-mode t))
+
 ;; setting up an LSP mode
 (use-package lsp-mode
   :ensure t
@@ -35,9 +40,10 @@
   (setq lsp-signature-render-documentation nil)
   (setq lsp-completion-provider :none)
   :hook (
-         (tuareg-mode . lsp))
+         (tuareg-mode . lsp)
+         (typescript-mode . lsp)
+         (web-mode . lsp))
   :commands lsp)
-
 
 (use-package lsp-ui
   :ensure t
@@ -52,18 +58,17 @@
   :commands lsp-ui-mode)
 ;; Lsp end
 
-
 ;; Flycheck start
-(use-package flycheck
-  :ensure t
-  :demand t
-  :config
-  ;; Making delay to stop showing erorrs on point
-  (setq flycheck-display-errors-delay 999999)
-  (setq flycheck-auto-display-errors-after-checking nil)
-  (global-flycheck-mode)
-  (with-eval-after-load 'flycheck
-    '(add-hook 'flycheck-mode-hook 'flycheck-popup-tip-mode)))
+;; (use-package flycheck
+;;:config
+;; Making delay to stop showing erorrs on point
+;;(setq flycheck-display-errors-delay 999999)
+;;(setq flycheck-auto-display-errors-after-checking nil)
+
+;; Disabling flycheck, because using default flymake
+;; (global-flycheck-mode)
+;;(with-eval-after-load 'flycheck
+;;'(add-hook 'flycheck-mode-hook 'flycheck-popup-tip-mode)))
 
 ;; Flycheck end
 
