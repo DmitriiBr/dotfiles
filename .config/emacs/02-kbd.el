@@ -27,3 +27,7 @@
 
 ;; Set ESC key to be always quit
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+
+(provide '02-kbd)
+
+;;; 02-kbd.el ends here

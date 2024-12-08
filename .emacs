@@ -7,6 +7,7 @@
 
 (load-file "~/.config/emacs/01-ui.el")
 (load-file "~/.config/emacs/02-kbd.el")
+(load-file "~/.config/emacs/03-lsp.el")
 
 ;; Truncate lines everywhere (Like in average editors)
 (setq-default truncate-lines t)
@@ -19,32 +20,6 @@
 ;; Setting font
 (set-face-attribute 'default nil :font "Iosevka NF"  :height 190)
 ;; Setting font end
-
-;; Kill buffers instantly
-(global-set-key (kbd "C-x k") 'kill-this-buffer)
-
-;; List buffers in minibuffer without spawning annoying "BuffersList Buffer"
-(global-set-key (kbd "C-x C-b") 'switch-to-buffer)
-
-;; Switch splits wihtout pain
-(global-set-key (kbd "C-x C-o") 'other-window)
-
-;; Compilation mode
-(global-set-key (kbd "C-c C-p") 'compile)
-
-;;' Insert new line below current line
-(global-set-key (kbd "<C-return>") (lambda ()
-                                     (interactive)
-                                     (end-of-line)
-                                     (newline-and-indent)))
-
-;; Insert new line above current line
-(global-set-key (kbd "<C-S-return>") (lambda ()
-                                       (interactive)
-                                       (previous-line)
-                                       (end-of-line)
-                                       (newline-and-indent)))
-
 
 ;; Best autopair package ever
 (use-package flex-autopair
@@ -122,7 +97,6 @@
 (global-set-key (kbd "C-x p f") 'projectile-find-file)
 (global-set-key (kbd "C-x p d") 'projectile-find-dir)
 
-
 ;; Misc
 (use-package exec-path-from-shell
   :config (exec-path-from-shell-initialize))
@@ -199,7 +173,7 @@
  '(custom-safe-themes
    '("dc15dbd4b0a00c64610fd4379a89424e0be1b418f09457e0f062cac931e8ca82" "b8bd60a23b9e2f08b0c437231ee84f2dacc70fdc4d5a0fb87229bb9926273fdd" "acfe7ff6aacb9432f124cde4e35d6d2b4bc52916411de73a6ccded9750c9fa97" "c0aa9e26715866404ac854a1023a177742b41a3a6b0fdbfe68d9f5414e24e170" "e13beeb34b932f309fb2c360a04a460821ca99fe58f69e65557d6c1b10ba18c7" default))
  '(package-selected-packages
-   '(tao-theme flex-autopair json-mode js2-mode web-mode tuareg mood-line doom-modeline move-text evil flycheck-posframe projectile counsel lsp-ui smex lsp-mode helm-ls-git helm-git-grep helm exec-path-from-shell company flycheck-inline add-node-modules-path apheleia flycheck tree-sitter-langs tree-sitter gruber-darker-theme typescript-mode ivy)))
+   '(flycheck-popup-tip tao-theme flex-autopair json-mode js2-mode web-mode tuareg mood-line doom-modeline move-text evil flycheck-posframe projectile counsel lsp-ui smex lsp-mode helm-ls-git helm-git-grep helm exec-path-from-shell company add-node-modules-path apheleia flycheck tree-sitter-langs tree-sitter gruber-darker-theme typescript-mode ivy)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
