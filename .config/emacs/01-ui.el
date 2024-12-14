@@ -14,8 +14,12 @@
 
 (add-to-list 'custom-theme-load-path "~/.emacs.d/etc/themes")
 
-(setq make-backup-files nil)
+;; Making no backup files
+(setq scroll-step 1)
 (setq inhibit-startup-screen t)
+(setq make-backup-files nil)
+(setq auto-save-default nil)
+(setq create-lockfiles nil)
 
 ;; Making Cursor line everywhere for now
 (global-hl-line-mode 1)
@@ -27,6 +31,12 @@
 (setq-default indent-tabs-mode nil)
 (setq-default tab-width 2)
 (global-auto-revert-mode t)
+
+(use-package tao-theme
+  :ensure t
+  :init
+  (setq tao-theme-use-sepia nil)
+  (setq tao-theme-use-boxes nil))
 
 ;; Setting font
 (set-face-attribute 'default nil :font "Iosevka NF"  :height 190)

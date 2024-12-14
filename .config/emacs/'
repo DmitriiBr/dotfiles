@@ -36,11 +36,8 @@
 
 ;; Killing buffer instead of window
 (global-set-key [remap evil-quit] 'kill-buffer-and-window)
-(evil-ex-define-cmd "wq" (lambda () 
-                           (interactive)
-                           (save-buffer)
-                           (kill-current-buffer)))
-
+(global-set-key [remap evil-save-and-quit] (lambda () (
+                                                       (save-buffer) (kill-this-buffer))))
 (use-package general
   :ensure t)
 
