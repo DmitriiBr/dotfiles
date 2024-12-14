@@ -1,11 +1,6 @@
 ;; Redefine some keyboard shortcuts
 
-;; Kill buffers instantly
-;; Dont work with evil
-;; (global-set-key (kbd "C-x k") 'kill-this-buffer)
 
-;; List buffers in minibuffer without spawning annoying "BuffersList Buffer"
-;; (global-set-key (kbd "C-x C-b") 'switch-to-buffer)
 
 ;; Switch splits without pain
 ;; (global-set-key (kbd "C-x C-o") 'other-window)
@@ -28,14 +23,13 @@
 
 ;; Duplicate line and move to next
 (defun duplicate-line-and-next ()
-  (lambda ()
-    (interactive)
-    (duplicate-line)
-    (next-line)))
-(global-set-key (kbd "C-,") (duplicate-line-and-next))
+  (interactive)
+  (duplicate-line)
+  (next-line))
+(global-set-key (kbd "C-,") 'duplicate-line-and-next)
 
 ;; Killing buffer instead of window
-(global-set-key [remap evil-quit] 'kill-buffer-and-window)
+(evil-ex-define-cmd "q" 'kill-current-buffer)
 (evil-ex-define-cmd "wq" (lambda () 
                            (interactive)
                            (save-buffer)
@@ -53,8 +47,23 @@
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 
 (leader-def
+  "k" '(:ignore t :which-key "sexp")
+  "k w" '(sp-wrap-round :which-key "wrap ()")
+  "k [" '(sp-wrap-square :which-key "wrap []")
+  "k {" '(sp-wrap-square :which-key "wrap {}")
+  "k ," '(sp-forward-barf-sexp :which-key "<-)")
+  "k ." '(sp-forward-slurp-sexp :which-key ")->")
+  "k <" '(sp-backward-barf-sexp :which-key "<-(")
+  "k >" '(sp-forward-barf-sexp :which-key "(->")
+  "k r" '(sp-raise-sexp :which-key "raise sexp"))
+
+(leader-def
   "f" '(:ignore t :which-key "file")
+  ;; Improved find file
   "f f" '(counsel-find-file :which-key "find file")
+  "f g" '(counsel-git :which-key "counsel git")
+  ;; Find all occurences in git repo
+  "g g" '(counsel-git-grep :which-key "counsel git grep")
   "f s" '(save-buffer :which-key "save file"))
 
 (leader-def
@@ -70,7 +79,9 @@
   "p d" '(projectile-find-dir :which-key "find dir in project"))
 
 (leader-def
-  "SPC" '(execute-extended-command :which-key "M-x"))
+  ;; Improved M-x with counsel
+  "SPC" '(counsel-M-x :which-key "M-x")
+  "s b" '(switch-to-buffer :which-key "switch to buffer"))
 
 (provide '02-kbd)
 
