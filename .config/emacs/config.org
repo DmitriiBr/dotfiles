@@ -183,25 +183,25 @@ Setting project engine.
   + web-mode :: jsx, tsx
     
 #+begin_src emacs-lisp
-   (use-package markdown-mode)
-   (use-package json-mode)
-   (use-package tuareg
-     :ensure t
-     :demand t
-     :mode
-     (("\\.ocamlinit\\'" . tuareg-mode))
-     (("\\.ml\\'" . tuareg-mode))
-     (("\\.mli\\'" . tuareg-mode)))
+  (use-package markdown-mode)
+  (use-package json-mode)
+  (use-package tuareg
+    :ensure t
+    :demand t
+    :mode
+    (("\\.ocamlinit\\'" . tuareg-mode))
+    (("\\.ml\\'" . tuareg-mode))
+    (("\\.mli\\'" . tuareg-mode)))
 
-   (use-package typescript-mode
-     :config
-     (add-hook 'typescript-mode-hook (lambda () (typescript-mode 1))))
+  (use-package typescript-mode
+    :config
+    (add-hook 'typescript-mode-hook (lambda () (typescript-mode 1))))
 
-   (use-package js2-mode)
-   (use-package web-mode
-     :config
-     (add-to-list 'auto-mode-alist '("\\.jsx\\'" . web-mode))
-     (add-to-list 'auto-mode-alist '("\\.tsx\\'" . web-mode)))
+  (use-package js2-mode)
+  (use-package web-mode
+    :config
+    (add-to-list 'auto-mode-alist '("\\.jsx\\'" . web-mode))
+    (add-to-list 'auto-mode-alist '("\\.tsx\\'" . web-mode)))
 #+end_src
 
 ** Formatting
@@ -238,7 +238,6 @@ Auto-format different source code files extremely intelligently
     (add-to-list 'apheleia-mode-alist '(json-mode . prettier))
     (apheleia-global-mode +1))
 #+end_src
-
 
 * LSP
 
@@ -332,4 +331,169 @@ Not using it because:
   ;;'(add-hook 'flycheck-mode-hook 'flycheck-popup-tip-mode)))
 #+end_src
 
+* Keybindings
 
+** New lines, duplicating
+
+#+begin_src emacs-lisp
+  ;; Insert new line below current line
+  (global-set-key (kbd "<C-return>") (lambda ()
+                                       (interactive)
+                                       (end-of-line)
+                                       (newline-and-indent)))
+
+  ;; Insert new line above current line
+  (global-set-key (kbd "<C-S-return>") (lambda ()
+                                         (interactive)
+                                         (previous-line)
+                                         (end-of-line)
+                                         (newline-and-indent)))
+
+  ;; Duplicate line and move to next
+  (defun duplicate-line-and-next ()
+    (interactive)
+    (duplicate-line)
+    (next-line))
+  (global-set-key (kbd "C-,") 'duplicate-line-and-next)
+#+end_src
+
+** Killing buffer instead of window
+
+#+begin_src emacs-lisp
+  (evil-ex-define-cmd "q" 'kill-current-buffer)
+  (evil-ex-define-cmd "wq" (lambda () 
+			     (interactive)
+			     (save-buffer)
+			     (kill-current-buffer)))
+#+end_src
+
+** General
+
+Using `general-package` kbd framework for bindings.
+
+*** Initializing
+
+Installing pacakge and defining function for setting leader keybindings.
+Setting `escape` to always quit instanly.
+
+#+begin_src emacs-lisp
+  (use-package general
+    :ensure t)
+
+  (general-create-definer leader-def
+    :states 'motion
+    :keymaps 'override
+    :prefix "SPC")
+
+
+  (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+
+  (leader-def
+    ;; Improved M-x with counsel
+    "SPC" '(counsel-M-x :which-key "M-x")
+    "s b" '(switch-to-buffer :which-key "switch to buffer"))
+#+end_src
+
+*** Org-mode keymaps
+
+*Not solved results of src block evaluation*
+
+#+begin_src emacs-lisp
+  (general-define-key
+   :states 'motion
+   :keymaps '(override org-mode-map)
+   "<tab>" 'org-cycle)
+
+  (leader-def
+    :keymaps 'org-mode-map
+    "m" '(:ignore t :which-key "org-mode")
+    "m e" '(:ignore t :which-key "eval")
+    "m e e" 'eval-last-sexp
+    "m e s" 'org-babel-execute-src-block)
+#+end_src
+
+*** Emacs-lisp-mode keymaps
+
+#+begin_src emacs-lisp
+  (leader-def
+    :keymaps 'emacs-lisp-mode-map
+    "m" '(:ignore t :which-key "emacs lisp")
+    "m e" '(:ignore t :which-key "eval")
+    "m e e" 'eval-last-sexp) 
+#+end_src
+
+*** Smartparens keymaps
+
+#+begin_src emacs-lisp
+  (leader-def
+    "k" '(:ignore t :which-key "sexp")
+    "k w" '(sp-wrap-round :which-key "wrap ()")
+    "k [" '(sp-wrap-square :which-key "wrap []")
+    "k {" '(sp-wrap-square :which-key "wrap {}")
+    "k ," '(sp-forward-barf-sexp :which-key "<-)")
+    "k ." '(sp-forward-slurp-sexp :which-key ")->")
+    "k <" '(sp-backward-barf-sexp :which-key "<-(")
+    "k >" '(sp-forward-barf-sexp :which-key "(->")
+    "k r" '(sp-raise-sexp :which-key "raise sexp"))
+#+end_src
+
+*** File keymaps
+
+#+begin_src emacs-lisp
+  (leader-def
+    "f" '(:ignore t :which-key "file")
+    "f f" '(counsel-find-file :which-key "find file")
+    "f g" '(counsel-git :which-key "counsel git")
+    "f s" '(save-buffer :which-key "save file"))
+  
+#+end_src
+
+*** Project keymaps
+
+#+begin_src emacs-lisp
+  (leader-def
+    ;;"p" 'projectile-command-map
+    "p" '(:ignore t :which-key "project")
+    "p f" '(projectile-find-file :which-key "find file in project")
+    "p d" '(projectile-find-dir :which-key "find dir in project"))
+#+end_src
+
+*** Magit keymaps
+
+#+begin_src emacs-lisp
+  (leader-def
+    "g" '(:ignore t :which-key "git")
+    "g s" '(magit-status  :which-key "magit status")
+    "g g" '(projectile-find-file :which-key "find file in project"))
+#+end_src
+
+*** Move text keymaps
+
+With this pacakge moving lines and regions are available
+
+#+begin_src emacs-lisp
+  (use-package move-text
+    :ensure t
+    :demand t
+    :init
+    :config)
+
+  (general-define-key
+   :states '(motion normal visual)
+   :keymaps 'override
+   "M-k" 'move-text-up
+   "M-j" 'move-text-down)
+#+end_src
+
+* Misc
+
+** Bindings on cyrillic letters
+
+#+begin_src emacs-lisp
+  (use-package reverse-im
+    :ensure t
+    :custom
+    (reverse-im-input-methods '("russian-computer"))
+    :config
+    (reverse-im-mode t))
+#+end_src

@@ -6,23 +6,8 @@
 
 (package-initialize)
 
-;; New config setup
+;; Loading config from .org file
 (org-babel-load-file "~/.config/emacs/config.org")
-
-(load-file "~/.config/emacs/02-kbd.el")
-
-(use-package move-text
-  :ensure t
-  :demand t
-  :init
-  :config)
-
-(use-package reverse-im
-  :ensure t
-  :custom
-  (reverse-im-input-methods '("russian-computer"))
-  :config
-  (reverse-im-mode t))
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
