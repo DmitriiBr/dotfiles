@@ -402,7 +402,8 @@ Setting `escape` to always quit instanly.
   (general-define-key
    :states 'motion
    :keymaps '(override org-mode-map)
-   "<tab>" 'org-cycle)
+   "<tab>" 'org-cycle
+   "g <tab>" 'org-cycle-global)
 
   (leader-def
     :keymaps 'org-mode-map
@@ -464,7 +465,7 @@ Setting `escape` to always quit instanly.
   (leader-def
     "g" '(:ignore t :which-key "git")
     "g s" '(magit-status  :which-key "magit status")
-    "g g" '(projectile-find-file :which-key "find file in project"))
+    "g g" '(counsel-git-grep :which-key "find file in project"))
 #+end_src
 
 *** Move text keymaps
