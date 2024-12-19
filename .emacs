@@ -5,11 +5,13 @@
 ;;(add-to-list 'package-archives '("melpa-stable" . "https://stable.melpa.org/packages/") t)
 (package-initialize)
 
-(load-file "~/.config/emacs/01-ui.el")
+;; New config setup
+(org-babel-load-file "~/.config/emacs/config.org")
+
+;; (load-file "~/.config/emacs/04-ivy.el")
+
+;; TODO: Replace with org config
 (load-file "~/.config/emacs/03-lsp.el")
-(load-file "~/.config/emacs/04-ivy.el")
-(load-file "~/.config/emacs/05-mood-line.el")
-(load-file "~/.config/emacs/06-evil.el")
 (load-file "~/.config/emacs/07-projectile.el")
 (load-file "~/.config/emacs/08-smartparens.el")
 ;; TODO: rename

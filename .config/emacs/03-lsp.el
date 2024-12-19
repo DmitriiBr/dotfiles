@@ -6,14 +6,11 @@
 
 ;; LSP MODE IS ENABLED!!!
 ;; Lsp start
-(defun add-lsp-hooks (lsp)
-  "Add lsp-mode for this major modes."
-  (tuareg-mode . lsp))
-
 (use-package flymake
   :ensure t
   :init
-  :config (flymake-mode t))
+  :config (flymake-mode t)
+  :hook (emacs-lisp-mode typesript-mode))
 
 ;; setting up an LSP mode
 (use-package lsp-mode
@@ -40,9 +37,10 @@
   (setq lsp-signature-render-documentation nil)
   (setq lsp-completion-provider :none)
   :hook (
-         (tuareg-mode . lsp)
+         ;; (tuareg-mode . lsp)
          (typescript-mode . lsp)
-         (web-mode . lsp))
+         (web-mode . lsp)
+         (js2-mode))
   :commands lsp)
 
 (use-package lsp-ui

@@ -43,6 +43,12 @@
   :keymaps 'override
   :prefix "SPC")
 
+;; Org mode keymaps
+(general-define-key
+ :keymap 'org-mode-map
+ :states 'motion
+ "<TAB>" 'org-cycle)
+
 ;; Set ESC key to be always quit
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 
