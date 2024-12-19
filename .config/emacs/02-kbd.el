@@ -1,13 +1,5 @@
 ;; Redefine some keyboard shortcuts
 
-
-
-;; Switch splits without pain
-;; (global-set-key (kbd "C-x C-o") 'other-window)
-
-;; Compilation mode
-;; (global-set-key (kbd "C-c C-p") 'compile)
-
 ;;' Insert new line below current line
 (global-set-key (kbd "<C-return>") (lambda ()
                                      (interactive)
@@ -45,9 +37,9 @@
 
 ;; Org mode keymaps
 (general-define-key
- :keymap 'org-mode-map
  :states 'motion
- "<TAB>" 'org-cycle)
+ :keymaps '(override org-mode-map)
+ "<tab>" 'org-cycle)
 
 ;; Set ESC key to be always quit
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
@@ -65,11 +57,8 @@
 
 (leader-def
   "f" '(:ignore t :which-key "file")
-  ;; Improved find file
   "f f" '(counsel-find-file :which-key "find file")
   "f g" '(counsel-git :which-key "counsel git")
-  ;; Find all occurences in git repo
-  "g g" '(counsel-git-grep :which-key "counsel git grep")
   "f s" '(save-buffer :which-key "save file"))
 
 (leader-def
@@ -83,6 +72,12 @@
   "p" '(:ignore t :which-key "project")
   "p f" '(projectile-find-file :which-key "find file in project")
   "p d" '(projectile-find-dir :which-key "find dir in project"))
+
+;; Magit keybindings
+(leader-def
+  "g" '(:ignore t :which-key "git")
+  "g s" '(magit-status  :which-key "magit status")
+  "g g" '(projectile-find-file :which-key "find file in project"))
 
 (leader-def
   ;; Improved M-x with counsel

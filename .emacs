@@ -3,18 +3,12 @@
 ;; Comment/uncomment this line to enable MELPA Stable if desired.  See `package-archive-priorities`
 ;; and `package-pinned-packages`. Most users will not need or want to do this.
 ;;(add-to-list 'package-archives '("melpa-stable" . "https://stable.melpa.org/packages/") t)
+
 (package-initialize)
 
 ;; New config setup
 (org-babel-load-file "~/.config/emacs/config.org")
 
-;; (load-file "~/.config/emacs/04-ivy.el")
-
-;; TODO: Replace with org config
-(load-file "~/.config/emacs/03-lsp.el")
-(load-file "~/.config/emacs/07-projectile.el")
-(load-file "~/.config/emacs/08-smartparens.el")
-;; TODO: rename
 (load-file "~/.config/emacs/02-kbd.el")
 
 (use-package move-text
@@ -29,57 +23,6 @@
   (reverse-im-input-methods '("russian-computer"))
   :config
   (reverse-im-mode t))
-
-(use-package magit
-  :ensure t
-  :init)
-
-;; Misc
-(use-package exec-path-from-shell
-  :config (exec-path-from-shell-initialize))
-(use-package add-node-modules-path
-  :ensure t
-  :init)
-(use-package eslint-fix)
-
-;; Modes
-(use-package markdown-mode)
-(use-package json-mode)
-(use-package js2-mode)
-
-(use-package typescript-mode
-  :config
-  (add-hook 'typescript-mode-hook (lambda () (typescript-mode 1))))
-
-(use-package web-mode
-  :config
-  (add-to-list 'auto-mode-alist '("\\.jsx\\'" . web-mode))
-  (add-to-list 'auto-mode-alist '("\\.tsx\\'" . web-mode)))
-
-(use-package tuareg
-  :ensure t
-  :demand t
-  :mode
-  (("\\.ocamlinit\\'" . tuareg-mode))
-  (("\\.ml\\'" . tuareg-mode))
-  (("\\.mli\\'" . tuareg-mode)))
-
-;;; APHELEIA
-;; auto-format different source code files extremely intelligently
-;; https://github.com/radian-software/aphelei
-(use-package apheleia
-  :ensure t
-  :demand t
-  :config
-  ;; You always should get prettier from formatters list and call prettiern bin to format buffer
-  (setf (alist-get 'prettier apheleia-formatters)
-        '(npx "prettier" "--stdin-filepath" filepath))
-  ;; Here prettier is connecting to modes
-  (add-to-list 'apheleia-mode-alist '(typescript-mode . prettier))
-  (add-to-list 'apheleia-mode-alist '(web-mode . prettier))
-  (add-to-list 'apheleia-mode-alist '(js2-mode . prettier))
-  (add-to-list 'apheleia-mode-alist '(json-mode . prettier))
-  (apheleia-global-mode +1))
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.

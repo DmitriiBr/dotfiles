@@ -32,7 +32,7 @@
 #+begin_src emacs-lisp
   (setq-default truncate-lines t)
   (setq-default gloabal-visual-mode t)
-  (global-auto-revert-mode t) 
+  (global-auto-revert-mode t)
 #+end_src
 
 ** Theme configuration
@@ -42,6 +42,7 @@ Setting font and theme custom load path.
 
 #+begin_src emacs-lisp
   (global-hl-line-mode 1) (add-to-list 'custom-theme-load-path "~/.emacs.d/etc/themes")
+
   (use-package tao-theme
     :ensure t
     :init
@@ -55,19 +56,19 @@ Setting font and theme custom load path.
 Using best mode-line theme
 
 #+begin_src emacs-lisp
-(use-package mood-line
-  :ensure t
-  :config
-  (mood-line-mode)
-  (setq mood-line-glyph-alist mood-line-glyphs-fira-code)
-  (setq mood-line-format
-        (mood-line-defformat
-         :left
-         (((mood-line-segment-buffer-status) . " ")
-          ((mood-line-segment-buffer-name)   . ""))
-         :right
-         (((mood-line-segment-scroll)             . " ")
-          ((mood-line-segment-cursor-position)    . "  ")))))
+  (use-package mood-line
+    :ensure t
+    :config
+    (mood-line-mode)
+    (setq mood-line-glyph-alist mood-line-glyphs-fira-code)
+    (setq mood-line-format
+	  (mood-line-defformat
+	   :left
+	   (((mood-line-segment-buffer-status) . " ")
+	    ((mood-line-segment-buffer-name)   . ""))
+	   :right
+	   (((mood-line-segment-scroll)             . " ")
+	    ((mood-line-segment-cursor-position)    . "  ")))))
 #+end_src
 
 * Evil mode
@@ -75,13 +76,14 @@ Using best mode-line theme
 Setting evil mode and cursor in insert state to bar with width of "3".
 
 #+begin_src emacs-lisp
-(use-package evil
-  :ensure t
-  :init
-  :config
-  (evil-mode 1))
+  (use-package evil
+    :ensure t
+    :init
+    :config
+    (evil-mode 1))
 
-(setq evil-insert-state-cursor '(bar . 3))
+  (setq evil-insert-state-cursor '(bar . 3))
+  (setq evil-want-C-i-jump nil)
 #+end_src
 
 * Searching, Ido + Ivy modes
@@ -91,9 +93,9 @@ Setting evil mode and cursor in insert state to bar with width of "3".
 Setting it by default and changing separator.
 
 #+begin_src emacs-lisp
-(ido-mode 1)
-(ido-everywhere 1)
-(setq ido-separator "\n")
+  (ido-mode 1)
+  (ido-everywhere 1)
+  (setq ido-separator "\n")
 #+end_src
 
 ** Ivy mode
@@ -127,4 +129,207 @@ Search engine for Ivy.
   :config (counsel-mode +1))
 #+end_src
 
-* 
+* Projectile
+
+Setting project engine.
+
+#+begin_src emacs-lisp
+(use-package projectile
+  :ensure t
+  :demand t
+  :init
+  :config
+  (projectile-mode +1))
+
+(setq projectile-completion-system 'ivy)
+#+end_src
+
+* Smartparens
+
+#+begin_src emacs-lisp
+  (use-package smartparens
+    :ensure smartparens  ;; install the package
+    :hook (prog-mode
+	   text-mode
+	   markdown-mode
+	   tuareg-mode
+	   emacs-lisp-mode
+	   typescript-mode
+	   web-mode
+	   js2-mode) ;; add `smartparens-mode` to these hooks
+    :config
+    ;; load default config
+    (require 'smartparens-config))
+#+end_src
+
+* Magit
+
+#+begin_src emacs-lisp
+  (use-package magit
+    :ensure t
+    :init)
+#+end_src
+
+* Major modes
+
+** Modes
+
++ tuareg-mode :: ocaml
++ markdown-mode :: markdown
++ json-mode :: json
++ js
+  + typescript-mode :: typescript
+  + js2-mode :: javascript
+  + web-mode :: jsx, tsx
+    
+#+begin_src emacs-lisp
+   (use-package markdown-mode)
+   (use-package json-mode)
+   (use-package tuareg
+     :ensure t
+     :demand t
+     :mode
+     (("\\.ocamlinit\\'" . tuareg-mode))
+     (("\\.ml\\'" . tuareg-mode))
+     (("\\.mli\\'" . tuareg-mode)))
+
+   (use-package typescript-mode
+     :config
+     (add-hook 'typescript-mode-hook (lambda () (typescript-mode 1))))
+
+   (use-package js2-mode)
+   (use-package web-mode
+     :config
+     (add-to-list 'auto-mode-alist '("\\.jsx\\'" . web-mode))
+     (add-to-list 'auto-mode-alist '("\\.tsx\\'" . web-mode)))
+#+end_src
+
+** Formatting
+
+Auto-format different source code files extremely intelligently
+
++ exec-path-from-shell :: don't need on windows
++ add-node-modules-path :: to use local node_modules bins
++ eslint-fix :: ??
+  
+*** Misc
+#+begin_src emacs-lisp
+  (use-package exec-path-from-shell
+    :config (exec-path-from-shell-initialize))
+  (use-package add-node-modules-path
+    :ensure t
+    :init)
+  (use-package eslint-fix)
+#+end_src
+
+*** Apheleia
+#+begin_src emacs-lisp
+  (use-package apheleia
+    :ensure t
+    :demand t
+    :config
+    ;; You always should get prettier from formatters list and call prettiern bin to format buffer
+    (setf (alist-get 'prettier apheleia-formatters)
+          '(npx "prettier" "--stdin-filepath" filepath))
+    ;; Here prettier is connecting to modes
+    (add-to-list 'apheleia-mode-alist '(typescript-mode . prettier))
+    (add-to-list 'apheleia-mode-alist '(web-mode . prettier))
+    (add-to-list 'apheleia-mode-alist '(js2-mode . prettier))
+    (add-to-list 'apheleia-mode-alist '(json-mode . prettier))
+    (apheleia-global-mode +1))
+#+end_src
+
+
+* LSP
+
+** Quick overview
+
++ Using `flymake` as error engine
++ Using main `lsp` pacakge for lsp-servers
++ Using `lsp-ui` package for hints and doc
++ Modes, that lsp is compatible with (now):
+  + typescript-mode
+  + 
+
+** Flymake
+
+#+begin_src emacs-lisp
+(use-package flymake
+  :ensure t
+  :init
+  :config (flymake-mode t)
+  :hook (emacs-lisp-mode typesript-mode))
+#+end_src
+
+** Lsp-mode
+
+#+begin_src emacs-lisp
+  (use-package lsp-mode
+    :ensure t
+    :demand t
+    :init
+    (setq lsp-keymap-prefix "C-c l")
+    (setq lsp-enable-on-type-formatting nil)
+    (setq lsp-log-io nil)
+    (setq lsp-diagnostics-provider :flymake)
+    (setq lsp-enable-symbol-highlighting nil)
+    (setq lsp-headerline-breadcrumb-enable nil)
+    (setq lsp-eldoc-enable-hover nil)
+    (setq lsp-enable-indentation nil)
+    (setq lsp-enable-text-document-color t)
+    (setq lsp-headerline-breadcrumb-enable nil)
+    (setq lsp-semantic-tokens-enable nil)
+    (setq lsp-signature-render-documentation nil)
+    (setq lsp-signature-auto-activate nil)
+    (setq lsp-modeline-code-actions-enable nil)
+    (setq lsp-eldoc-enable-hover nil)
+    (setq lsp-modeline-diagnostics-enable nil)
+    (setq lsp-signature-auto-activate nil)
+    (setq lsp-signature-render-documentation nil)
+    (setq lsp-completion-provider :none)
+    :hook (
+	   ;; (tuareg-mode . lsp)
+	   (typescript-mode . lsp)
+	   (web-mode . lsp)
+	   (js2-mode))
+    :commands lsp)
+#+end_src
+
+** Lsp-ui
+
+#+begin_src emacs-lisp
+  (use-package lsp-ui
+    :ensure t
+    :init
+    (setq lsp-ui-doc-enable t)
+    (setq lsp-ui-sideline-show-diagnostics t)
+    (setq lsp-ui-sideline-show-hover nil)
+    (setq lsp-ui-doc-position 'at-point)
+    (setq lsp-ui-doc-max-width 70)
+    (setq lsp-ui-sideline-show-hover nil)
+    (setq lsp-ui-sideline-show-code-actions nil)
+    :commands lsp-ui-mode)
+#+end_src
+
+** Fycheck (NOT ENABLED)
+
+Not using it because:
+
++ Flymake is enough
++ Cannot get rid of inline error popup on pointer hover
+
+#+begin_src emacs-lisp
+  ;; Flycheck start
+  ;; (use-package flycheck
+  ;;:config
+  ;; Making delay to stop showing erorrs on point
+  ;;(setq flycheck-display-errors-delay 999999)
+  ;;(setq flycheck-auto-display-errors-after-checking nil)
+
+  ;; Disabling flycheck, because using default flymake
+  ;; (global-flycheck-mode)
+  ;;(with-eval-after-load 'flycheck
+  ;;'(add-hook 'flycheck-mode-hook 'flycheck-popup-tip-mode)))
+#+end_src
+
+
