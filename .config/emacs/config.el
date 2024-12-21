@@ -44,7 +44,8 @@
   :ensure t
   :init
   :config
-  (evil-mode 1))
+  (evil-mode 1)
+  (evil-set-undo-system 'undo-redo))
 
 (setq evil-insert-state-cursor '(bar . 3))
 (setq evil-want-C-i-jump nil)
@@ -69,6 +70,16 @@
   :demand t
   :init
   :config (counsel-mode +1))
+
+(use-package which-key
+  :ensure t
+  :demand t
+  :init
+  :config
+  (which-key-mode +1))
+
+(setq which-key-idle-delay 0.5)
+(setq which-key-idle-secondary-delay 0)
 
 (use-package projectile
   :ensure t
@@ -98,31 +109,27 @@
   :init)
 
 (use-package markdown-mode)
-(use-package json-mode)
-(use-package tuareg
-  :ensure t
-  :demand t
-  :mode
-  (("\\.ocamlinit\\'" . tuareg-mode))
-  (("\\.ml\\'" . tuareg-mode))
-  (("\\.mli\\'" . tuareg-mode)))
+  (use-package json-mode)
 
-(use-package typescript-mode
-  :config
-  (add-hook 'typescript-mode-hook (lambda () (typescript-mode 1))))
+  (use-package tuareg
+    :ensure t
+    :demand t
+    :mode
+    (("\\.ocamlinit\\'" . tuareg-mode))
+    (("\\.ml\\'" . tuareg-mode))
+    (("\\.mli\\'" . tuareg-mode)))
 
-(use-package js2-mode)
-(use-package web-mode
-  :config
-  (add-to-list 'auto-mode-alist '("\\.jsx\\'" . web-mode))
-  (add-to-list 'auto-mode-alist '("\\.tsx\\'" . web-mode)))
+  (use-package typescript-mode
+    :config
+    (add-hook 'typescript-mode-hook (lambda () (typescript-mode 1))))
 
-(use-package exec-path-from-shell
-  :config (exec-path-from-shell-initialize))
-(use-package add-node-modules-path
-  :ensure t
-  :init)
-(use-package eslint-fix)
+  (use-package js2-mode)
+  (use-package web-mode
+    :config
+    (add-to-list 'auto-mode-alist '("\\.jsx\\'" . web-mode))
+    (add-to-list 'auto-mode-alist '("\\.tsx\\'" . web-mode)))
+
+(setq org-startup-indented t)
 
 (use-package apheleia
   :ensure t
@@ -220,9 +227,9 @@
 
 (evil-ex-define-cmd "q" 'kill-current-buffer)
 (evil-ex-define-cmd "wq" (lambda () 
-                           (interactive)
-                           (save-buffer)
-                           (kill-current-buffer)))
+			   (interactive)
+			   (save-buffer)
+			   (kill-current-buffer)))
 
 (use-package general
   :ensure t)
@@ -234,16 +241,43 @@
 
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 
+(leader-def
+  ;; Improved M-x with counsel
+  "SPC" '(counsel-M-x :which-key "M-x")
+  "w s m" '(which-key-show-major-mode :which-key "major mode keymaps")
+  "s b" '(switch-to-buffer :which-key "switch to buffer"))
+
 (general-define-key
  :states 'motion
- :keymaps '(override org-mode-map)
- "<tab>" 'org-cycle)
+ :keymaps 'org-mode-map
+ "<tab>" 'org-cycle
+ "g <tab>" 'org-cycle-global)
 
 (leader-def
- :keymaps 'emacs-lisp-mode-map
- "m" '(:ignore t :which-key "emacs lisp")
- "m e" '(:ignore t :which-key "eval")
- "m e e" 'eval-last-sexp)
+  :keymaps 'org-mode-map
+  "m" '(:ignore t :which-key "MAJOR MODE KEYMAPS")
+  "m e" '(:ignore t :which-key "eval")
+  "m e e" '(eval-last-sexp :which-key "eval sexp")
+  "m e s" '(org-babel-execute-src-block :which-key "eval src block")
+  "m c ," '(org-insert-structure-template :which-key "inserc template"))
+
+(general-define-key
+ :states 'motion
+ :keymaps 'markdown-mode-map
+ "<tab>" 'markdown-cycle)
+
+(leader-def
+  :keymaps 'emacs-lisp-mode-map
+  "m" '(:ignore t :which-key "MAJOR MODE KEYMAPS")
+  "m e" '(:ignore t :which-key "eval")
+  "m e e" 'eval-last-sexp)
+
+(leader-def
+  :keymaps 'tuareg-mode-map
+  "m" '(:ignore t :which-key "MAJOR MODE KEYMAPS")
+  "m e" '(:ignore t :which-key "eval")
+  "m e e" 'tuareg-eval-phrase
+  "m c" '(tuareg-comment-dwim :which-key "comment line"))
 
 (leader-def
   "k" '(:ignore t :which-key "sexp")
@@ -269,6 +303,34 @@
   "p d" '(projectile-find-dir :which-key "find dir in project"))
 
 (leader-def
-  ;; Improved M-x with counsel
-  "SPC" '(counsel-M-x :which-key "M-x")
-  "s b" '(switch-to-buffer :which-key "switch to buffer"))
+  "g" '(:ignore t :which-key "git")
+  "g s" '(magit-status  :which-key "magit status")
+  "g g" '(counsel-git-grep :which-key "find file in project"))
+
+(use-package move-text
+  :ensure t
+  :demand t
+  :init
+  :config)
+
+(general-define-key
+ :states '(motion normal visual)
+ :keymaps 'override
+ "M-k" 'move-text-up
+ "M-j" 'move-text-down)
+
+(use-package exec-path-from-shell
+  :config (exec-path-from-shell-initialize))
+
+(use-package add-node-modules-path
+  :ensure t
+  :init)
+
+(use-package eslint-fix)
+
+(use-package reverse-im
+  :ensure t
+  :custom
+  (reverse-im-input-methods '("russian-computer"))
+  :config
+  (reverse-im-mode t))

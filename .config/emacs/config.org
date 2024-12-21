@@ -3,7 +3,6 @@
 #+DATE: 19-12-2024
 
 * Emacs UI configuration
-
 ** Removing unneeded elements and features
 
 #+begin_src emacs-lisp
@@ -80,14 +79,14 @@ Setting evil mode and cursor in insert state to bar with width of "3".
     :ensure t
     :init
     :config
-    (evil-mode 1))
+    (evil-mode 1)
+    (evil-set-undo-system 'undo-redo))
 
   (setq evil-insert-state-cursor '(bar . 3))
   (setq evil-want-C-i-jump nil)
 #+end_src
 
 * Searching, Ido + Ivy modes
-
 ** Ido mode
 
 Setting it by default and changing separator.
@@ -127,6 +126,20 @@ Search engine for Ivy.
   :demand t
   :init
   :config (counsel-mode +1))
+#+end_src
+
+* Which key
+
+#+begin_src emacs-lisp
+  (use-package which-key
+    :ensure t
+    :demand t
+    :init
+    :config
+    (which-key-mode +1))
+
+  (setq which-key-idle-delay 0.5)
+  (setq which-key-idle-secondary-delay 0)
 #+end_src
 
 * Projectile
@@ -172,10 +185,9 @@ Setting project engine.
 
 * Major modes
 
-** Modes
-
 + tuareg-mode :: ocaml
 + markdown-mode :: markdown
++ org-mode :: org
 + json-mode :: json
 + js
   + typescript-mode :: typescript
@@ -183,46 +195,34 @@ Setting project engine.
   + web-mode :: jsx, tsx
     
 #+begin_src emacs-lisp
-  (use-package markdown-mode)
-  (use-package json-mode)
-  (use-package tuareg
-    :ensure t
-    :demand t
-    :mode
-    (("\\.ocamlinit\\'" . tuareg-mode))
-    (("\\.ml\\'" . tuareg-mode))
-    (("\\.mli\\'" . tuareg-mode)))
+    (use-package markdown-mode)
+    (use-package json-mode)
 
-  (use-package typescript-mode
-    :config
-    (add-hook 'typescript-mode-hook (lambda () (typescript-mode 1))))
+    (use-package tuareg
+      :ensure t
+      :demand t
+      :mode
+      (("\\.ocamlinit\\'" . tuareg-mode))
+      (("\\.ml\\'" . tuareg-mode))
+      (("\\.mli\\'" . tuareg-mode)))
 
-  (use-package js2-mode)
-  (use-package web-mode
-    :config
-    (add-to-list 'auto-mode-alist '("\\.jsx\\'" . web-mode))
-    (add-to-list 'auto-mode-alist '("\\.tsx\\'" . web-mode)))
+    (use-package typescript-mode
+      :config
+      (add-hook 'typescript-mode-hook (lambda () (typescript-mode 1))))
+
+    (use-package js2-mode)
+    (use-package web-mode
+      :config
+      (add-to-list 'auto-mode-alist '("\\.jsx\\'" . web-mode))
+      (add-to-list 'auto-mode-alist '("\\.tsx\\'" . web-mode)))
+
+  (setq org-startup-indented t)
 #+end_src
 
-** Formatting
+* Apheleia
 
 Auto-format different source code files extremely intelligently
 
-+ exec-path-from-shell :: don't need on windows
-+ add-node-modules-path :: to use local node_modules bins
-+ eslint-fix :: ??
-  
-*** Misc
-#+begin_src emacs-lisp
-  (use-package exec-path-from-shell
-    :config (exec-path-from-shell-initialize))
-  (use-package add-node-modules-path
-    :ensure t
-    :init)
-  (use-package eslint-fix)
-#+end_src
-
-*** Apheleia
 #+begin_src emacs-lisp
   (use-package apheleia
     :ensure t
@@ -240,7 +240,6 @@ Auto-format different source code files extremely intelligently
 #+end_src
 
 * LSP
-
 ** Quick overview
 
 + Using `flymake` as error engine
@@ -332,7 +331,6 @@ Not using it because:
 #+end_src
 
 * Keybindings
-
 ** New lines, duplicating
 
 #+begin_src emacs-lisp
@@ -369,12 +367,12 @@ Not using it because:
 
 ** General
 
-Using `general-package` kbd framework for bindings.
+Using **general-package** kbd framework for bindings.
 
 *** Initializing
 
 Installing pacakge and defining function for setting leader keybindings.
-Setting `escape` to always quit instanly.
+Setting **escape** to always quit instanly.
 
 #+begin_src emacs-lisp
   (use-package general
@@ -385,45 +383,68 @@ Setting `escape` to always quit instanly.
     :keymaps 'override
     :prefix "SPC")
 
-
   (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 
   (leader-def
     ;; Improved M-x with counsel
     "SPC" '(counsel-M-x :which-key "M-x")
+    "w s m" '(which-key-show-major-mode :which-key "major mode keymaps")
     "s b" '(switch-to-buffer :which-key "switch to buffer"))
 #+end_src
 
-*** Org-mode keymaps
+**** Org-mode keymaps
 
 *Not solved results of src block evaluation*
 
 #+begin_src emacs-lisp
   (general-define-key
    :states 'motion
-   :keymaps '(override org-mode-map)
+   :keymaps 'org-mode-map
    "<tab>" 'org-cycle
    "g <tab>" 'org-cycle-global)
 
   (leader-def
     :keymaps 'org-mode-map
-    "m" '(:ignore t :which-key "org-mode")
+    "m" '(:ignore t :which-key "MAJOR MODE KEYMAPS")
     "m e" '(:ignore t :which-key "eval")
-    "m e e" 'eval-last-sexp
-    "m e s" 'org-babel-execute-src-block)
+    "m e e" '(eval-last-sexp :which-key "eval sexp")
+    "m e s" '(org-babel-execute-src-block :which-key "eval src block")
+    "m ," '(org-insert-structure-template :which-key "inserc template")
+    "m <" '(org-promote-subtree :which-key "<- promote subtree")
+    "m >" '(org-demote-subtree :which-key "demote subtree ->"))
 #+end_src
 
-*** Emacs-lisp-mode keymaps
+***** Markdown-mode keymaps
+
+#+begin_src emacs-lisp
+  (general-define-key
+   :states 'motion
+   :keymaps 'markdown-mode-map
+   "<tab>" 'markdown-cycle)
+#+end_src
+
+***** Emacs-lisp-mode keymaps
 
 #+begin_src emacs-lisp
   (leader-def
     :keymaps 'emacs-lisp-mode-map
-    "m" '(:ignore t :which-key "emacs lisp")
+    "m" '(:ignore t :which-key "MAJOR MODE KEYMAPS")
     "m e" '(:ignore t :which-key "eval")
     "m e e" 'eval-last-sexp) 
 #+end_src
 
-*** Smartparens keymaps
+***** Tuareg-mode (Ocaml) keymaps
+
+#+begin_src emacs-lisp
+  (leader-def
+    :keymaps 'tuareg-mode-map
+    "m" '(:ignore t :which-key "MAJOR MODE KEYMAPS")
+    "m e" '(:ignore t :which-key "eval")
+    "m e e" 'tuareg-eval-phrase
+    "m c" '(tuareg-comment-dwim :which-key "comment line"))
+#+end_src
+
+***** Smartparens keymaps
 
 #+begin_src emacs-lisp
   (leader-def
@@ -438,7 +459,7 @@ Setting `escape` to always quit instanly.
     "k r" '(sp-raise-sexp :which-key "raise sexp"))
 #+end_src
 
-*** File keymaps
+***** File keymaps
 
 #+begin_src emacs-lisp
   (leader-def
@@ -446,10 +467,9 @@ Setting `escape` to always quit instanly.
     "f f" '(counsel-find-file :which-key "find file")
     "f g" '(counsel-git :which-key "counsel git")
     "f s" '(save-buffer :which-key "save file"))
-  
 #+end_src
 
-*** Project keymaps
+***** Project keymaps
 
 #+begin_src emacs-lisp
   (leader-def
@@ -459,7 +479,7 @@ Setting `escape` to always quit instanly.
     "p d" '(projectile-find-dir :which-key "find dir in project"))
 #+end_src
 
-*** Magit keymaps
+***** Magit keymaps
 
 #+begin_src emacs-lisp
   (leader-def
@@ -468,7 +488,7 @@ Setting `escape` to always quit instanly.
     "g g" '(counsel-git-grep :which-key "find file in project"))
 #+end_src
 
-*** Move text keymaps
+***** Move text keymaps
 
 With this pacakge moving lines and regions are available
 
@@ -487,6 +507,22 @@ With this pacakge moving lines and regions are available
 #+end_src
 
 * Misc
+** Paths 
+
++ exec-path-from-shell :: don't need on windows
++ add-node-modules-path :: to use local node_modules bins
++ eslint-fix :: ??
+
+#+begin_src emacs-lisp
+  (use-package exec-path-from-shell
+    :config (exec-path-from-shell-initialize))
+
+  (use-package add-node-modules-path
+    :ensure t
+    :init)
+
+  (use-package eslint-fix)
+#+end_src
 
 ** Bindings on cyrillic letters
 
