@@ -18,13 +18,11 @@
 (global-auto-revert-mode t)
 
 (global-hl-line-mode 1) (add-to-list 'custom-theme-load-path "~/.emacs.d/etc/themes")
-
-(use-package tao-theme
-  :ensure t
-  :init
-  (setq tao-theme-use-sepia nil)
-  (setq tao-theme-use-boxes nil))
 (set-face-attribute 'default nil :font "Iosevka NF"  :height 190)
+
+(use-package doom-themes :ensure t :config
+  (load-theme 'doom-one t)
+  (doom-themes-org-config))
 
 (use-package mood-line
   :ensure t
@@ -111,13 +109,7 @@
 (use-package markdown-mode)
   (use-package json-mode)
 
-  (use-package tuareg
-    :ensure t
-    :demand t
-    :mode
-    (("\\.ocamlinit\\'" . tuareg-mode))
-    (("\\.ml\\'" . tuareg-mode))
-    (("\\.mli\\'" . tuareg-mode)))
+
 
   (use-package typescript-mode
     :config
@@ -130,6 +122,17 @@
     (add-to-list 'auto-mode-alist '("\\.tsx\\'" . web-mode)))
 
 (setq org-startup-indented t)
+
+(use-package tuareg
+  :ensure t
+  :demand t
+  :mode
+  (("\\.ocamlinit\\'" . tuareg-mode))
+  (("\\.ml\\'" . tuareg-mode))
+  (("\\.mli\\'" . tuareg-mode)))
+
+(use-package utop
+  :ensure t)
 
 (use-package apheleia
   :ensure t
@@ -219,11 +222,10 @@
                                        (newline-and-indent)))
 
 ;; Duplicate line and move to next
-(defun duplicate-line-and-next ()
-  (interactive)
-  (duplicate-line)
-  (next-line))
-(global-set-key (kbd "C-,") 'duplicate-line-and-next)
+(global-set-key (kbd "C-,") (lambda ()
+                              (interactive)
+                              (duplicate-line)
+                              (next-line)))
 
 (evil-ex-define-cmd "q" 'kill-current-buffer)
 (evil-ex-define-cmd "wq" (lambda () 
@@ -235,7 +237,7 @@
   :ensure t)
 
 (general-create-definer leader-def
-  :states 'motion
+  :states '(normal motion visual emacs)
   :keymaps 'override
   :prefix "SPC")
 
@@ -244,8 +246,13 @@
 (leader-def
   ;; Improved M-x with counsel
   "SPC" '(counsel-M-x :which-key "M-x")
-  "w s m" '(which-key-show-major-mode :which-key "major mode keymaps")
-  "s b" '(switch-to-buffer :which-key "switch to buffer"))
+  "w s m" '(which-key-show-major-mode :which-key "[W]K [M]AJOR MODE KEYMAPS"))
+
+(leader-def
+  "b" '(:ignore t :which-key "[B]uffer")
+  "b s" '(switch-to-buffer :which-key "[S]witch to buffer")
+  "b p" '(previous-buffer :which-key "[P]revious buffer")
+  "b n" '(next-buffer :which-key "[N]ext buffer"))
 
 (general-define-key
  :states 'motion
@@ -255,11 +262,14 @@
 
 (leader-def
   :keymaps 'org-mode-map
-  "m" '(:ignore t :which-key "MAJOR MODE KEYMAPS")
-  "m e" '(:ignore t :which-key "eval")
-  "m e e" '(eval-last-sexp :which-key "eval sexp")
-  "m e s" '(org-babel-execute-src-block :which-key "eval src block")
-  "m c ," '(org-insert-structure-template :which-key "inserc template"))
+  "m" '(:ignore t :which-key "[M]AJOR MODE KEYMAPS")
+  "m e" '(:ignore t :which-key "[E]val")
+  "m e e" '(eval-last-sexp :which-key "[E]val sexp")
+  "m e s" '(org-babel-execute-src-block :which-key "[E]val [s]rc block")
+  "m ," '(org-insert-structure-template :which-key "inserc template")
+  "m <" '(org-do-promote :which-key "<- promote")
+  "m >" '(org-do-demote :which-key "demote ->")
+  "m o" '(org-open-at-point :which-key "[O]pen link at point"))
 
 (general-define-key
  :states 'motion
@@ -268,44 +278,45 @@
 
 (leader-def
   :keymaps 'emacs-lisp-mode-map
-  "m" '(:ignore t :which-key "MAJOR MODE KEYMAPS")
-  "m e" '(:ignore t :which-key "eval")
-  "m e e" 'eval-last-sexp)
+  "m" '(:ignore t :which-key "[M]AJOR MODE KEYMAPS")
+  "m e" '(:ignore t :which-key "[E]val")
+  "m e e" '(eval-last-sexp :which-key "[E]val [e]xpression"))
 
 (leader-def
   :keymaps 'tuareg-mode-map
-  "m" '(:ignore t :which-key "MAJOR MODE KEYMAPS")
-  "m e" '(:ignore t :which-key "eval")
-  "m e e" 'tuareg-eval-phrase
-  "m c" '(tuareg-comment-dwim :which-key "comment line"))
+  "m" '(:ignore t :which-key "[M]AJOR MODE KEYMAPS")
+  "m e" '(:ignore t :which-key "[E]val")
+  "m e e" '(utop-eval-phrase :which-key "[E]val [e]xpression")
+  "m e r" '(utop-eval-region :which-key "[E]val [R]egion")
+  "m c" '(tuareg-comment-dwim :which-key "[C]omment line"))
 
 (leader-def
   "k" '(:ignore t :which-key "sexp")
-  "k w" '(sp-wrap-round :which-key "wrap ()")
-  "k [" '(sp-wrap-square :which-key "wrap []")
-  "k {" '(sp-wrap-square :which-key "wrap {}")
+  "k w" '(sp-wrap-round :which-key "[W]rap ()")
+  "k u" '(sp-unwrap-sexp :which-key "[U]nwrap sexp")
+  "k [" '(sp-wrap-square :which-key "[W]rap []")
+  "k {" '(sp-wrap-square :which-key "[W]rap {}")
   "k ," '(sp-forward-barf-sexp :which-key "<-)")
   "k ." '(sp-forward-slurp-sexp :which-key ")->")
   "k <" '(sp-backward-barf-sexp :which-key "<-(")
   "k >" '(sp-forward-barf-sexp :which-key "(->")
-  "k r" '(sp-raise-sexp :which-key "raise sexp"))
+  "k r" '(sp-raise-sexp :which-key "[R]aise sexp"))
 
 (leader-def
-  "f" '(:ignore t :which-key "file")
-  "f f" '(counsel-find-file :which-key "find file")
-  "f g" '(counsel-git :which-key "counsel git")
-  "f s" '(save-buffer :which-key "save file"))
+  "f" '(:ignore t :which-key "[F]ile")
+  "f f" '(counsel-find-file :which-key "[F]ind file")
+  "f g" '(counsel-git :which-key "counsel [g]it")
+  "f s" '(save-buffer :which-key "[S]ave file"))
 
 (leader-def
-  ;;"p" 'projectile-command-map
-  "p" '(:ignore t :which-key "project")
-  "p f" '(projectile-find-file :which-key "find file in project")
-  "p d" '(projectile-find-dir :which-key "find dir in project"))
+  "p" '(:ignore t :which-key "[P]roject")
+  "p f" '(projectile-find-file :which-key "[F]ind file in project")
+  "p d" '(projectile-find-dir :which-key "find [d]ir in project"))
 
 (leader-def
-  "g" '(:ignore t :which-key "git")
-  "g s" '(magit-status  :which-key "magit status")
-  "g g" '(counsel-git-grep :which-key "find file in project"))
+  "g" '(:ignore t :which-key "[G]it")
+  "g s" '(magit-status  :which-key "magit [s]tatus")
+  "g p" '(counsel-git-grep :which-key "find file in [p]roject"))
 
 (use-package move-text
   :ensure t
