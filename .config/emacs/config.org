@@ -48,6 +48,7 @@ Setting font and theme custom load path.
     :ensure t
     :config
     (setq doom-themes-enable-italic nil)
+    (setq doom-themes-enable-bold t)
     (load-theme 'doom-one t)
     (doom-themes-org-config))
 #+end_src
@@ -86,6 +87,7 @@ Setting evil mode and cursor in insert state to bar with width of "3".
 
   (setq evil-insert-state-cursor '(bar . 3))
   (setq evil-want-C-i-jump nil)
+  (setq evil-move-beyond-eol nil)
 #+end_src
 
 * Searching, Ido + Ivy modes
@@ -386,6 +388,10 @@ Using **general-package** kbd framework for bindings.
 Installing pacakge and defining function for setting leader keybindings.
 Setting **escape** to always quit instanly.
 
+Overriding evil's ~$~ keybinding, because in visual mode, even if ~setq evil-move-beyond-eol nil~ is set,
+the cursor is moving "beyond" last character, so it's now remapped to ~evil-last-non-blank~ (like in normal VIM).
+
+#+name: Initialization and global remappings
 #+begin_src emacs-lisp
   (use-package general
     :ensure t)
@@ -401,6 +407,11 @@ Setting **escape** to always quit instanly.
     ;; Improved M-x with counsel
     "SPC" '(counsel-M-x :which-key "M-x")
     "w s m" '(which-key-show-major-mode :which-key "[W]K [M]AJOR MODE KEYMAPS"))
+
+  (general-define-key
+   :states 'visual
+   :keymaps 'override
+   "$" 'evil-last-non-blank)
 #+end_src
 
 *** Buffers 
@@ -438,7 +449,9 @@ Buffers managerment:
     "m ," '(org-insert-structure-template :which-key "inserc template")
     "m <" '(org-do-promote :which-key "<- promote")
     "m >" '(org-do-demote :which-key "demote ->")
-    "m o" '(org-open-at-point :which-key "[O]pen link at point"))
+    "m o" '(org-open-at-point :which-key "[O]pen link at point")
+    "m i l" '(org-insert-link :which-key "[I]nsert [l]ink")
+    "m i i" '(org-insert-item :which-key "[I]nsert [i]tem"))
 #+end_src
 
 *** Markdown-mode keymaps
@@ -470,7 +483,8 @@ Evaluating with **utop**.
     "m" '(:ignore t :which-key "[M]AJOR MODE KEYMAPS")
     "m e" '(:ignore t :which-key "[E]val")
     "m e e" '(utop-eval-phrase :which-key "[E]val [e]xpression")
-    "m e r" '(utop-eval-region :which-key "[E]val [R]egion")
+    "m e r" '(utop-eval-region :which-key "[E]val [r]egion")
+    "m e b" '(utop-eval-buffer :which-key "[E]val [B]uffer")
     "m c" '(tuareg-comment-dwim :which-key "[C]omment line"))
 #+end_src
 

@@ -20,7 +20,11 @@
 (global-hl-line-mode 1) (add-to-list 'custom-theme-load-path "~/.emacs.d/etc/themes")
 (set-face-attribute 'default nil :font "Iosevka NF"  :height 190)
 
-(use-package doom-themes :ensure t :config
+(use-package doom-themes
+  :ensure t
+  :config
+  (setq doom-themes-enable-italic nil)
+  (setq doom-themes-enable-bold t)
   (load-theme 'doom-one t)
   (doom-themes-org-config))
 
@@ -47,6 +51,7 @@
 
 (setq evil-insert-state-cursor '(bar . 3))
 (setq evil-want-C-i-jump nil)
+(setq evil-move-beyond-eol nil)
 
 (ido-mode 1)
 (ido-everywhere 1)
@@ -248,6 +253,11 @@
   "SPC" '(counsel-M-x :which-key "M-x")
   "w s m" '(which-key-show-major-mode :which-key "[W]K [M]AJOR MODE KEYMAPS"))
 
+(general-define-key
+ :states 'visual
+ :keymaps 'override
+ "$" 'evil-last-non-blank)
+
 (leader-def
   "b" '(:ignore t :which-key "[B]uffer")
   "b s" '(switch-to-buffer :which-key "[S]witch to buffer")
@@ -269,7 +279,9 @@
   "m ," '(org-insert-structure-template :which-key "inserc template")
   "m <" '(org-do-promote :which-key "<- promote")
   "m >" '(org-do-demote :which-key "demote ->")
-  "m o" '(org-open-at-point :which-key "[O]pen link at point"))
+  "m o" '(org-open-at-point :which-key "[O]pen link at point")
+  "m i l" '(org-insert-link :which-key "[I]nsert [l]ink")
+  "m i i" '(org-insert-item :which-key "[I]nsert [i]tem"))
 
 (general-define-key
  :states 'motion
@@ -287,7 +299,8 @@
   "m" '(:ignore t :which-key "[M]AJOR MODE KEYMAPS")
   "m e" '(:ignore t :which-key "[E]val")
   "m e e" '(utop-eval-phrase :which-key "[E]val [e]xpression")
-  "m e r" '(utop-eval-region :which-key "[E]val [R]egion")
+  "m e r" '(utop-eval-region :which-key "[E]val [r]egion")
+  "m e b" '(utop-eval-buffer :which-key "[E]val [B]uffer")
   "m c" '(tuareg-comment-dwim :which-key "[C]omment line"))
 
 (leader-def
