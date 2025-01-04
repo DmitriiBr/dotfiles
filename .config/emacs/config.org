@@ -34,16 +34,29 @@
   (global-auto-revert-mode t)
 #+end_src
 
-** Theme configuration
-
-(Tao theme is a monochrome theme. Not installed)
-
-Setting font and theme custom load path.
+** Font configuration
 
 #+begin_src emacs-lisp
   (global-hl-line-mode 1) (add-to-list 'custom-theme-load-path "~/.emacs.d/etc/themes")
   (set-face-attribute 'default nil :font "Iosevka NF"  :height 190)
+#+end_src
 
+** Theme configuration
+*** Tao theme
+
+Tao theme is a monochrome theme.
+
+#+begin_src emacs-lisp
+  (use-package tao-theme
+    :ensure t
+    :init
+    :config
+    (setq tao-theme-use-boxes nil))
+#+end_src
+
+*** Doom theme
+
+#+begin_src emacs-lisp :eval no
   (use-package doom-themes
     :ensure t
     :config
@@ -51,6 +64,33 @@ Setting font and theme custom load path.
     (setq doom-themes-enable-bold t)
     (load-theme 'doom-one t)
     (doom-themes-org-config))
+#+end_src
+
+* Garbage collection
+
+Makes startup faster by reducing the frequency of garbage collection
+
+#+begin_src emacs-lisp
+  ;; Using garbage magic hack.
+  (use-package gcmh
+    :ensure t
+    :config
+    (gcmh-mode 1))
+  ;; Setting garbage collection threshold
+  (setq gc-cons-threshold 402653184
+        gc-cons-percentage 0.6)
+
+  ;; Profile emacs startup
+  (add-hook 'emacs-startup-hook
+            (lambda ()
+              (message "*** Emacs loaded in %s with %d garbage collections."
+                       (format "%.2f seconds"
+                               (float-time
+                                (time-subtract after-init-time before-init-time)))
+                       gcs-done)))
+
+  ;; Silence compiler warnings as they can be pretty disruptive
+  (setq comp-async-report-warnings-errors nil)
 #+end_src
 
 * Mood line
@@ -393,15 +433,16 @@ the cursor is moving "beyond" last character, so it's now remapped to ~evil-last
 
 #+name: Initialization and global remappings
 #+begin_src emacs-lisp
+  (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+
   (use-package general
     :ensure t)
 
   (general-create-definer leader-def
-    :states '(normal motion visual emacs)
+    :states '(normal insert motion visual emacs)
     :keymaps 'override
-    :prefix "SPC")
-
-  (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+    :prefix "SPC"
+    :non-normal-prefix "M-SPC")
 
   (leader-def
     ;; Improved M-x with counsel
@@ -409,9 +450,10 @@ the cursor is moving "beyond" last character, so it's now remapped to ~evil-last
     "w s m" '(which-key-show-major-mode :which-key "[W]K [M]AJOR MODE KEYMAPS"))
 
   (general-define-key
-   :states 'visual
+   :states '(visual normal motion)
    :keymaps 'override
-   "$" 'evil-last-non-blank)
+   "$" 'evil-last-non-blank
+   "-" 'evil-last-non-blank)
 #+end_src
 
 *** Buffers 
@@ -520,7 +562,8 @@ Evaluating with **utop**.
   (leader-def
     "p" '(:ignore t :which-key "[P]roject")
     "p f" '(projectile-find-file :which-key "[F]ind file in project")
-    "p d" '(projectile-find-dir :which-key "find [d]ir in project"))
+    "p d" '(projectile-find-dir :which-key "find [d]ir in project")
+    "p s" '(counsel-git-grep :which-key "[S]earch for occurencies"))
 #+end_src
 
 *** Magit keymaps
@@ -528,8 +571,7 @@ Evaluating with **utop**.
 #+begin_src emacs-lisp
   (leader-def
     "g" '(:ignore t :which-key "[G]it")
-    "g s" '(magit-status  :which-key "magit [s]tatus")
-    "g p" '(counsel-git-grep :which-key "find file in [p]roject"))
+    "g s" '(magit-status  :which-key "magit [s]tatus"))
 #+end_src
 
 *** Move text keymaps

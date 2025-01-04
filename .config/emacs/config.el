@@ -20,6 +20,12 @@
 (global-hl-line-mode 1) (add-to-list 'custom-theme-load-path "~/.emacs.d/etc/themes")
 (set-face-attribute 'default nil :font "Iosevka NF"  :height 190)
 
+(use-package tao-theme
+  :ensure t
+  :init
+  :config
+  (setq tao-theme-use-boxes nil))
+
 (use-package doom-themes
   :ensure t
   :config
@@ -27,6 +33,27 @@
   (setq doom-themes-enable-bold t)
   (load-theme 'doom-one t)
   (doom-themes-org-config))
+
+;; Using garbage magic hack.
+(use-package gcmh
+  :ensure t
+  :config
+  (gcmh-mode 1))
+;; Setting garbage collection threshold
+(setq gc-cons-threshold 402653184
+      gc-cons-percentage 0.6)
+
+;; Profile emacs startup
+(add-hook 'emacs-startup-hook
+          (lambda ()
+            (message "*** Emacs loaded in %s with %d garbage collections."
+                     (format "%.2f seconds"
+                             (float-time
+                              (time-subtract after-init-time before-init-time)))
+                     gcs-done)))
+
+;; Silence compiler warnings as they can be pretty disruptive
+(setq comp-async-report-warnings-errors nil)
 
 (use-package mood-line
   :ensure t
@@ -242,9 +269,10 @@
   :ensure t)
 
 (general-create-definer leader-def
-  :states '(normal motion visual emacs)
+  :states '(normal insert motion visual emacs)
   :keymaps 'override
-  :prefix "SPC")
+  :prefix "SPC"
+  :non-normal-prefix "M-SPC")
 
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 
@@ -254,9 +282,10 @@
   "w s m" '(which-key-show-major-mode :which-key "[W]K [M]AJOR MODE KEYMAPS"))
 
 (general-define-key
- :states 'visual
+ :states '(visual normal motion)
  :keymaps 'override
- "$" 'evil-last-non-blank)
+ "$" 'evil-last-non-blank
+ "-" 'evil-last-non-blank)
 
 (leader-def
   "b" '(:ignore t :which-key "[B]uffer")
@@ -324,12 +353,12 @@
 (leader-def
   "p" '(:ignore t :which-key "[P]roject")
   "p f" '(projectile-find-file :which-key "[F]ind file in project")
-  "p d" '(projectile-find-dir :which-key "find [d]ir in project"))
+  "p d" '(projectile-find-dir :which-key "find [d]ir in project")
+  "p s" '(counsel-git-grep :which-key "[S]earch for occurencies"))
 
 (leader-def
   "g" '(:ignore t :which-key "[G]it")
-  "g s" '(magit-status  :which-key "magit [s]tatus")
-  "g p" '(counsel-git-grep :which-key "find file in [p]roject"))
+  "g s" '(magit-status  :which-key "magit [s]tatus"))
 
 (use-package move-text
   :ensure t
