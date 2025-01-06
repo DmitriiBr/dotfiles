@@ -316,6 +316,7 @@ Auto-format different source code files extremely intelligently
 
 ** Lsp-mode
 
+#+NAME: LSP config
 #+begin_src emacs-lisp
   (use-package lsp-mode
     :ensure t
@@ -344,7 +345,7 @@ Auto-format different source code files extremely intelligently
 	   ;; (tuareg-mode . lsp)
 	   (typescript-mode . lsp)
 	   (web-mode . lsp)
-	   (js2-mode))
+	   (js2-mode . lsp))
     :commands lsp)
 #+end_src
 
@@ -388,6 +389,7 @@ Not using it because:
 * Keybindings
 ** New lines, duplicating
 
+#+NAME: Basing global keybindings
 #+begin_src emacs-lisp
   ;; Insert new line below current line
   (global-set-key (kbd "<C-return>") (lambda ()
@@ -475,7 +477,15 @@ Buffers managerment:
 
 *Not solved results of src block evaluation*
 
+#+NAME: Keymaps
 #+begin_src emacs-lisp
+  (defun dm/org-insert-name (&optional count)
+    "Inserting a `#+NAME:` tag, and then, entering `-- INSERT --` state,
+     good for creating named src's"
+    (interactive)
+    (insert "#+NAME: ")
+    (evil-insert count))
+
   (general-define-key
    :states 'motion
    :keymaps 'org-mode-map
@@ -493,7 +503,8 @@ Buffers managerment:
     "m >" '(org-do-demote :which-key "demote ->")
     "m o" '(org-open-at-point :which-key "[O]pen link at point")
     "m i l" '(org-insert-link :which-key "[I]nsert [l]ink")
-    "m i i" '(org-insert-item :which-key "[I]nsert [i]tem"))
+    "m i i" '(org-insert-item :which-key "[I]nsert [i]tem")
+    "m i n" '(dm/org-insert-name :which-key "[I]nsert [n]name"))
 #+end_src
 
 *** Markdown-mode keymaps
@@ -538,7 +549,7 @@ Evaluating with **utop**.
     "k w" '(sp-wrap-round :which-key "[W]rap ()")
     "k u" '(sp-unwrap-sexp :which-key "[U]nwrap sexp")
     "k [" '(sp-wrap-square :which-key "[W]rap []")
-    "k {" '(sp-wrap-square :which-key "[W]rap {}")
+    "k {" '(sp-wrap-curly :which-key "[W]rap {}")
     "k ," '(sp-forward-barf-sexp :which-key "<-)")
     "k ." '(sp-forward-slurp-sexp :which-key ")->")
     "k <" '(sp-backward-barf-sexp :which-key "<-(")
@@ -619,4 +630,11 @@ With this pacakge moving lines and regions are available
     (reverse-im-input-methods '("russian-computer"))
     :config
     (reverse-im-mode t))
+#+end_src
+
+** Tabs and indentation
+
+#+NAME: Setting default tab width
+#+begin_src emacs-lisp
+  (setq-default tab-width 4)
 #+end_src

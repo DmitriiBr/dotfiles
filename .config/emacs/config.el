@@ -213,7 +213,7 @@
 	 ;; (tuareg-mode . lsp)
 	 (typescript-mode . lsp)
 	 (web-mode . lsp)
-	 (js2-mode))
+	 (js2-mode . lsp))
   :commands lsp)
 
 (use-package lsp-ui
@@ -265,6 +265,8 @@
 			   (save-buffer)
 			   (kill-current-buffer)))
 
+(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+
 (use-package general
   :ensure t)
 
@@ -273,8 +275,6 @@
   :keymaps 'override
   :prefix "SPC"
   :non-normal-prefix "M-SPC")
-
-(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 
 (leader-def
   ;; Improved M-x with counsel
@@ -293,6 +293,13 @@
   "b p" '(previous-buffer :which-key "[P]revious buffer")
   "b n" '(next-buffer :which-key "[N]ext buffer"))
 
+(defun dm/org-insert-name (&optional count)
+  "Inserting a `#+NAME:` tag, and then, entering `-- INSERT --` state,
+   good for creating named src's"
+  (interactive)
+  (insert "#+NAME: ")
+  (evil-insert count))
+
 (general-define-key
  :states 'motion
  :keymaps 'org-mode-map
@@ -310,7 +317,8 @@
   "m >" '(org-do-demote :which-key "demote ->")
   "m o" '(org-open-at-point :which-key "[O]pen link at point")
   "m i l" '(org-insert-link :which-key "[I]nsert [l]ink")
-  "m i i" '(org-insert-item :which-key "[I]nsert [i]tem"))
+  "m i i" '(org-insert-item :which-key "[I]nsert [i]tem")
+  "m i n" '(dm/org-insert-name :which-key "[I]nsert [n]name"))
 
 (general-define-key
  :states 'motion
@@ -337,7 +345,7 @@
   "k w" '(sp-wrap-round :which-key "[W]rap ()")
   "k u" '(sp-unwrap-sexp :which-key "[U]nwrap sexp")
   "k [" '(sp-wrap-square :which-key "[W]rap []")
-  "k {" '(sp-wrap-square :which-key "[W]rap {}")
+  "k {" '(sp-wrap-curly :which-key "[W]rap {}")
   "k ," '(sp-forward-barf-sexp :which-key "<-)")
   "k ." '(sp-forward-slurp-sexp :which-key ")->")
   "k <" '(sp-backward-barf-sexp :which-key "<-(")
@@ -387,3 +395,5 @@
   (reverse-im-input-methods '("russian-computer"))
   :config
   (reverse-im-mode t))
+
+(setq-default tab-width 4)
