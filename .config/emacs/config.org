@@ -278,10 +278,12 @@ Setting project engine.
 
 Auto-format different source code files extremely intelligently
 
+#+NAME: Apheleia config
 #+begin_src emacs-lisp
+  (setq dm/is-windows-system (not (or (eq system-type 'gnu/linux) (eq system-type 'darwin))))
+
   (use-package apheleia
-    :ensure t
-    :demand t
+    :if (not dm/is-windows-system)
     :config
     ;; You always should get prettier from formatters list and call prettiern bin to format buffer
     (setf (alist-get 'prettier apheleia-formatters)
@@ -294,15 +296,23 @@ Auto-format different source code files extremely intelligently
     (apheleia-global-mode +1))
 #+end_src
 
+** Prettier for windows
+
+#+NAME: Prettier config
+#+begin_src emacs-lisp
+  (use-package prettier
+    :if dm/is-windows-system
+    :config (prettier-global-mode +1))
+#+end_src
+
 * LSP
 ** Quick overview
 
-+ Using `flymake` as error engine
-+ Using main `lsp` pacakge for lsp-servers
-+ Using `lsp-ui` package for hints and doc
++ Using ~flymake~ as error engine
++ Using main ~lsp~ package for lsp-servers
++ Using ~lsp-ui~ package for hints and doc
 + Modes, that lsp is compatible with (now):
   + typescript-mode
-  + 
 
 ** Flymake
 
@@ -320,6 +330,7 @@ Auto-format different source code files extremely intelligently
 #+begin_src emacs-lisp
   (use-package lsp-mode
     :ensure t
+    :defer t
     :demand t
     :init
     (setq lsp-keymap-prefix "C-c l")
@@ -342,18 +353,20 @@ Auto-format different source code files extremely intelligently
     (setq lsp-signature-render-documentation nil)
     (setq lsp-completion-provider :none)
     :hook (
-	   ;; (tuareg-mode . lsp)
-	   (typescript-mode . lsp)
-	   (web-mode . lsp)
-	   (js2-mode . lsp))
+           ;; (tuareg-mode . lsp)
+           (typescript-mode . lsp)
+           (web-mode . lsp)
+           (js2-mode . lsp))
     :commands lsp)
 #+end_src
 
 ** Lsp-ui
 
+#+NAME: LSP ui config
 #+begin_src emacs-lisp
   (use-package lsp-ui
     :ensure t
+    :defer t
     :init
     (setq lsp-ui-doc-enable t)
     (setq lsp-ui-sideline-show-diagnostics t)
@@ -363,27 +376,6 @@ Auto-format different source code files extremely intelligently
     (setq lsp-ui-sideline-show-hover nil)
     (setq lsp-ui-sideline-show-code-actions nil)
     :commands lsp-ui-mode)
-#+end_src
-
-** Fycheck (NOT ENABLED)
-
-Not using it because:
-
-+ Flymake is enough
-+ Cannot get rid of inline error popup on pointer hover
-
-#+begin_src emacs-lisp
-  ;; Flycheck start
-  ;; (use-package flycheck
-  ;;:config
-  ;; Making delay to stop showing erorrs on point
-  ;;(setq flycheck-display-errors-delay 999999)
-  ;;(setq flycheck-auto-display-errors-after-checking nil)
-
-  ;; Disabling flycheck, because using default flymake
-  ;; (global-flycheck-mode)
-  ;;(with-eval-after-load 'flycheck
-  ;;'(add-hook 'flycheck-mode-hook 'flycheck-popup-tip-mode)))
 #+end_src
 
 * Keybindings
@@ -604,6 +596,15 @@ With this pacakge moving lines and regions are available
 #+end_src
 
 * Misc
+** Windows Git diff path
+
+Need to use GNU utils on windows.
+
+#+NAME: Windows diff path config
+#+begin_src emacs-lisp
+  (if dm/is-windows-system (add-to-list 'exec-path "c:/Program Files/Git/usr/bin"))
+#+end_src
+
 ** Paths 
 
 + exec-path-from-shell :: don't need on windows

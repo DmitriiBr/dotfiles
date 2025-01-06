@@ -166,9 +166,10 @@
 (use-package utop
   :ensure t)
 
+(setq dm/is-windows-system (not (or (eq system-type 'gnu/linux) (eq system-type 'darwin))))
+
 (use-package apheleia
-  :ensure t
-  :demand t
+  :if (not dm/is-windows-system)
   :config
   ;; You always should get prettier from formatters list and call prettiern bin to format buffer
   (setf (alist-get 'prettier apheleia-formatters)
@@ -180,6 +181,10 @@
   (add-to-list 'apheleia-mode-alist '(json-mode . prettier))
   (apheleia-global-mode +1))
 
+(use-package prettier
+  :if dm/is-windows-system
+  :config (prettier-global-mode +1))
+
 (use-package flymake
   :ensure t
   :init
@@ -188,6 +193,7 @@
 
 (use-package lsp-mode
   :ensure t
+  :defer t
   :demand t
   :init
   (setq lsp-keymap-prefix "C-c l")
@@ -210,14 +216,15 @@
   (setq lsp-signature-render-documentation nil)
   (setq lsp-completion-provider :none)
   :hook (
-	 ;; (tuareg-mode . lsp)
-	 (typescript-mode . lsp)
-	 (web-mode . lsp)
-	 (js2-mode . lsp))
+         ;; (tuareg-mode . lsp)
+         (typescript-mode . lsp)
+         (web-mode . lsp)
+         (js2-mode . lsp))
   :commands lsp)
 
 (use-package lsp-ui
   :ensure t
+  :defer t
   :init
   (setq lsp-ui-doc-enable t)
   (setq lsp-ui-sideline-show-diagnostics t)
@@ -227,18 +234,6 @@
   (setq lsp-ui-sideline-show-hover nil)
   (setq lsp-ui-sideline-show-code-actions nil)
   :commands lsp-ui-mode)
-
-;; Flycheck start
-;; (use-package flycheck
-;;:config
-;; Making delay to stop showing erorrs on point
-;;(setq flycheck-display-errors-delay 999999)
-;;(setq flycheck-auto-display-errors-after-checking nil)
-
-;; Disabling flycheck, because using default flymake
-;; (global-flycheck-mode)
-;;(with-eval-after-load 'flycheck
-;;'(add-hook 'flycheck-mode-hook 'flycheck-popup-tip-mode)))
 
 ;; Insert new line below current line
 (global-set-key (kbd "<C-return>") (lambda ()
@@ -379,6 +374,10 @@
  :keymaps 'override
  "M-k" 'move-text-up
  "M-j" 'move-text-down)
+
+(setq ispell-program-name "aspell")
+
+(if dm/is-windows-system (add-to-list 'exec-path "c:/Program Files/Git/usr/bin"))
 
 (use-package exec-path-from-shell
   :config (exec-path-from-shell-initialize))
