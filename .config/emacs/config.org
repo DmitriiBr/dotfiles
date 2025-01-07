@@ -113,21 +113,38 @@ Using best mode-line theme
 	    ((mood-line-segment-cursor-position)    . "  ")))))
 #+end_src
 
-* Evil mode
+* Evil
+** Evil mode
 
-Setting evil mode and cursor in insert state to bar with width of "3".
+Setting evil mode:
++ Setting cursor in ~insert~ state to width of ~bar . 3~
++ Making evil ~EOL~ jumps "vim-like"
++ ~evil-want-keybinding~ set to ~nil~, because ~evil-collection~ package is used
 
+#+NAME: Evil mode setup
 #+begin_src emacs-lisp
   (use-package evil
     :ensure t
     :init
+    (setq evil-insert-state-cursor '(bar . 3))
+    (setq evil-move-beyond-eol nil)
+    (setq evil-want-keybinding nil)
     :config
     (evil-mode 1)
     (evil-set-undo-system 'undo-redo))
+#+end_src
 
-  (setq evil-insert-state-cursor '(bar . 3))
-  (setq evil-want-C-i-jump nil)
-  (setq evil-move-beyond-eol nil)
+** Evil everywhere
+
+Setting up evil everywhere.
+
+#+NAME: Evil collection setup
+#+begin_src emacs-lisp
+  (use-package evil-collection
+    :after evil
+    :config
+    (setq evil-collection-mode-list '(dashboard dired ibuffer magit))
+    (evil-collection-init))
 #+end_src
 
 * Searching, Ido + Ivy modes
@@ -496,7 +513,8 @@ Buffers managerment:
     "m o" '(org-open-at-point :which-key "[O]pen link at point")
     "m i l" '(org-insert-link :which-key "[I]nsert [l]ink")
     "m i i" '(org-insert-item :which-key "[I]nsert [i]tem")
-    "m i n" '(dm/org-insert-name :which-key "[I]nsert [n]name"))
+    "m i n" '(dm/org-insert-name :which-key "[I]nsert [n]name")
+    "m x f" '(org-emphasize :which-key "Emphasize C-c C-x C-f"))
 #+end_src
 
 *** Markdown-mode keymaps

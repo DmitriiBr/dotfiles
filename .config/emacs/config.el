@@ -72,13 +72,18 @@
 (use-package evil
   :ensure t
   :init
+  (setq evil-insert-state-cursor '(bar . 3))
+  (setq evil-move-beyond-eol nil)
+  (setq evil-want-keybinding nil)
   :config
   (evil-mode 1)
   (evil-set-undo-system 'undo-redo))
 
-(setq evil-insert-state-cursor '(bar . 3))
-(setq evil-want-C-i-jump nil)
-(setq evil-move-beyond-eol nil)
+(use-package evil-collection
+  :after evil
+  :config
+  (setq evil-collection-mode-list '(dashboard dired ibuffer))
+  (evil-collection-init))
 
 (ido-mode 1)
 (ido-everywhere 1)
@@ -313,7 +318,8 @@
   "m o" '(org-open-at-point :which-key "[O]pen link at point")
   "m i l" '(org-insert-link :which-key "[I]nsert [l]ink")
   "m i i" '(org-insert-item :which-key "[I]nsert [i]tem")
-  "m i n" '(dm/org-insert-name :which-key "[I]nsert [n]name"))
+  "m i n" '(dm/org-insert-name :which-key "[I]nsert [n]name")
+  "m x f" '(org-emphasize :which-key "Emphasize C-c C-x C-f"))
 
 (general-define-key
  :states 'motion
@@ -374,8 +380,6 @@
  :keymaps 'override
  "M-k" 'move-text-up
  "M-j" 'move-text-down)
-
-(setq ispell-program-name "aspell")
 
 (if dm/is-windows-system (add-to-list 'exec-path "c:/Program Files/Git/usr/bin"))
 
