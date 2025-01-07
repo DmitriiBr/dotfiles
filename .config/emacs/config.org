@@ -195,7 +195,6 @@ Search engine for Ivy.
   (use-package which-key
     :ensure t
     :demand t
-    :init
     :config
     (which-key-mode +1))
 
@@ -211,7 +210,6 @@ Setting project engine.
 (use-package projectile
   :ensure t
   :demand t
-  :init
   :config
   (projectile-mode +1))
 
@@ -260,8 +258,6 @@ Setting project engine.
 #+begin_src emacs-lisp
     (use-package markdown-mode)
     (use-package json-mode)
-
-
 
     (use-package typescript-mode
       :config
@@ -336,7 +332,6 @@ Auto-format different source code files extremely intelligently
 #+begin_src emacs-lisp
 (use-package flymake
   :ensure t
-  :init
   :config (flymake-mode t)
   :hook (emacs-lisp-mode typesript-mode))
 #+end_src
@@ -346,9 +341,9 @@ Auto-format different source code files extremely intelligently
 #+NAME: LSP config
 #+begin_src emacs-lisp
   (use-package lsp-mode
+    :disabled t
     :ensure t
     :defer t
-    :demand t
     :init
     (setq lsp-keymap-prefix "C-c l")
     (setq lsp-enable-on-type-formatting nil)
@@ -382,6 +377,7 @@ Auto-format different source code files extremely intelligently
 #+NAME: LSP ui config
 #+begin_src emacs-lisp
   (use-package lsp-ui
+    :disabled t
     :ensure t
     :defer t
     :init
@@ -396,30 +392,6 @@ Auto-format different source code files extremely intelligently
 #+end_src
 
 * Keybindings
-** New lines, duplicating
-
-#+NAME: Basing global keybindings
-#+begin_src emacs-lisp
-  ;; Insert new line below current line
-  (global-set-key (kbd "<C-return>") (lambda ()
-                                       (interactive)
-                                       (end-of-line)
-                                       (newline-and-indent)))
-
-  ;; Insert new line above current line
-  (global-set-key (kbd "<C-S-return>") (lambda ()
-                                         (interactive)
-                                         (previous-line)
-                                         (end-of-line)
-                                         (newline-and-indent)))
-
-  ;; Duplicate line and move to next
-  (global-set-key (kbd "C-,") (lambda ()
-                                (interactive)
-                                (duplicate-line)
-                                (next-line)))
-#+end_src
-
 ** Killing buffer instead of window
 
 #+begin_src emacs-lisp
@@ -432,7 +404,7 @@ Auto-format different source code files extremely intelligently
 
 ** General
 
-Using **general-package** kbd framework for bindings.
+Using *general-package* kbd framework for bindings.
 
 *** Initializing
 
@@ -446,8 +418,7 @@ the cursor is moving "beyond" last character, so it's now remapped to ~evil-last
 #+begin_src emacs-lisp
   (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 
-  (use-package general
-    :ensure t)
+  (use-package general :ensure t)
 
   (general-create-definer leader-def
     :states '(normal insert motion visual emacs)
@@ -465,6 +436,18 @@ the cursor is moving "beyond" last character, so it's now remapped to ~evil-last
    :keymaps 'override
    "$" 'evil-last-non-blank
    "-" 'evil-last-non-blank)
+#+end_src
+
+*** Duplicating lines
+
+#+NAME: Duplicate line and move to next
+#+begin_src emacs-lisp
+  (general-define-key
+   :keymaps 'global
+   "C-," (lambda ()
+           (interactive)
+           (duplicate-line)
+           (next-line)))
 #+end_src
 
 *** Buffers 
@@ -579,12 +562,15 @@ Evaluating with **utop**.
 
 *** Project keymaps
 
+#+NAME: Projectile keymaps
 #+begin_src emacs-lisp
   (leader-def
     "p" '(:ignore t :which-key "[P]roject")
     "p f" '(projectile-find-file :which-key "[F]ind file in project")
     "p d" '(projectile-find-dir :which-key "find [d]ir in project")
-    "p s" '(counsel-git-grep :which-key "[S]earch for occurencies"))
+    "p s" '(counsel-git-grep :which-key "[S]earch for occurencies")
+    "p b" '(:ignore t :which-key "[B]uffers")
+    "p b s" '(projectile-switch-to-buffer :which-key "[S]witch to buffer"))
 #+end_src
 
 *** Magit keymaps
@@ -601,10 +587,7 @@ With this pacakge moving lines and regions are available
 
 #+begin_src emacs-lisp
   (use-package move-text
-    :ensure t
-    :demand t
-    :init
-    :config)
+    :ensure t)
 
   (general-define-key
    :states '(motion normal visual)
