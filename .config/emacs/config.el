@@ -208,12 +208,20 @@
   :init
   (vertico-mode))
 
+(use-package vertico-multiform
+  :init
+  (add-to-list 'vertico-multiform-categories
+               '(file
+                 (+vertico-transform-functions . +vertico-highlight-directory)))
+  (add-to-list 'vertico-multiform-commands
+               '(execute-extended-command
+                 (+vertico-transform-functions . +vertico-highlight-enabled-mode)))
+  (vertico-multiform-mode))
+
 (use-package orderless
   :ensure t
   :custom
-  ;; Configure a custom style dispatcher (see the Consult wiki)
-  ;; (orderless-style-dispatchers '(+orderless-consult-dispatch orderless-affix-dispatch))
-  ;; (orderless-component-separator #'orderless-escapable-split-on-space)
+  (orderless-component-separator #'orderless-escapable-split-on-space)
   (completion-styles '(orderless basic))
   (completion-category-defaults nil)
   (completion-category-overrides '((file (styles partial-completion)))))
@@ -381,7 +389,15 @@
 
 (leader-def
   "SPC" '(execute-extended-command :which-key "M-x")
-  "w s m" '(which-key-show-major-mode :which-key "[W]K [M]AJOR MODE KEYMAPS"))
+  "w s m" '(which-key-show-major-mode :which-key "[W]K [M]AJOR MODE KEYMAPS")
+  "'" '(vertico-repeat :which-key "Resume")
+  "y" '(consult-yank-pop :which-key "[Y]and pop"))
+
+(general-define-key
+ :states '(visual normal motion)
+ :keymaps 'override
+ "$" 'evil-last-non-blank
+ "-" 'evil-last-non-blank)
 
 (general-define-key
  :states '(visual normal motion)
@@ -395,6 +411,26 @@
          (interactive)
          (duplicate-line)
          (next-line)))
+
+(leader-def
+  "s" '(:ignore t :which-key "[S]earch")
+  "s l" '(consult-line :which-key "[I]search")
+  "s L" '(consult-line-multi :which-key "[L]ines multi")
+  "s h" '(consult-isearch-history :which-key "[H]istory of isearch")
+  "s k" '(consult-keep-lines :which-key "[K]eep lines")
+  "s u" '(consult-focus-lines :which-key "[F]ocus lines"))
+
+(general-define-key
+ :keymaps 'isearch-mode-map
+ "M-e"  'consult-isearch-history      
+ "M-s e"  'consult-isearch-history     
+ "M-s l"  'consult-line                 
+ "M-s L"  'consult-line-multi)
+
+(general-define-key
+ :keymaps 'minibuffer-local-map
+ "M-h" 'consult-history
+ "M-r" 'consult-history)
 
 (leader-def
   "b" '(:ignore t :which-key "[B]uffer")
@@ -466,6 +502,7 @@
 (leader-def
   "f" '(:ignore t :which-key "[F]ile")
   "f f" '(find-file :which-key "[F]ind file")
+  "f r" '(consult-recent-file :which-key "[R] file")
   "f s" '(save-buffer :which-key "[S]ave file"))
 
 (leader-def
@@ -508,3 +545,10 @@
   (reverse-im-mode t))
 
 (setq-default tab-width 4)
+
+(use-package recentf
+  :ensure t
+  :init
+  (recentf-mode t)
+  :config
+  (setq recentf-max-saved-items 50))

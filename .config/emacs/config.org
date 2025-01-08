@@ -222,7 +222,7 @@ Using best mode-line theme
 	    ((mood-line-segment-cursor-position)    . "  ")))))
 #+end_src
 
-* Evil
+* Evil ~:tools~
 ** Evil mode
 
 Setting evil mode:
@@ -298,19 +298,6 @@ Ivy prescient mode is a package, that enables history in minibuffer.
 ** Vertico mode
 *** Vertico
 
-+ [X] Start with plain Emacs (emacs -Q).
-+ [X] Install and enable Vertico to get incremental minibuffer completion.
-+ [X] Install Orderless and/or configure the built-in completion styles for more flexible minibuffer filtering.
-+ [ ] Install Marginalia if you like rich minibuffer annotations.
-+ [ ] Install Embark and add two keybindings for embark-dwim and embark-act.
-  I am using the mnemonic keybindings M-. and C-. since these commands allow you to act
-  on the object at point or in the minibuffer.
-+ [X] Install Consult if you want additional featureful completion commands, e.g., the buffer
-  switcher consult-buffer with preview or the line-based search consult-line.
-+ [ ] Install Embark-Consult and Wgrep for export from consult-line to occur-mode buffers and from
-  consult-grep to editable grep-mode buffers.
-+ [ ] Fine tune Vertico with extensions.
-
 #+NAME: Vertico config
 #+begin_src emacs-lisp
   (use-package vertico
@@ -324,16 +311,32 @@ Ivy prescient mode is a package, that enables history in minibuffer.
     (vertico-mode))
 #+end_src
 
+*** Vertico multiform
+
+#+NAME: Vertico multiform config
+#+begin_src emacs-lisp
+  (use-package vertico-multiform
+    :after vertico
+    :config
+    (add-to-list 'vertico-multiform-categories
+                 '(file
+                   (+vertico-transform-functions . +vertico-highlight-directory)))
+    (add-to-list 'vertico-multiform-commands
+                 '(execute-extended-command
+                   (+vertico-transform-functions . +vertico-highlight-enabled-mode)))
+    (vertico-multiform-mode))
+#+end_src
+
 *** Orderless
+
+Completion engine.
 
 #+NAME: Orderless config
 #+begin_src emacs-lisp
   (use-package orderless
     :ensure t
     :custom
-    ;; Configure a custom style dispatcher (see the Consult wiki)
-    ;; (orderless-style-dispatchers '(+orderless-consult-dispatch orderless-affix-dispatch))
-    ;; (orderless-component-separator #'orderless-escapable-split-on-space)
+    (orderless-component-separator #'orderless-escapable-split-on-space)
     (completion-styles '(orderless basic))
     (completion-category-defaults nil)
     (completion-category-overrides '((file (styles partial-completion)))))
@@ -601,7 +604,15 @@ the cursor is moving "beyond" last character, so it's now remapped to ~evil-last
 
   (leader-def
     "SPC" '(execute-extended-command :which-key "M-x")
-    "w s m" '(which-key-show-major-mode :which-key "[W]K [M]AJOR MODE KEYMAPS"))
+    "w s m" '(which-key-show-major-mode :which-key "[W]K [M]AJOR MODE KEYMAPS")
+    "'" '(vertico-repeat :which-key "Resume")
+    "y" '(consult-yank-pop :which-key "[Y]and pop"))
+
+  (general-define-key
+   :states '(visual normal motion)
+   :keymaps 'override
+   "$" 'evil-last-non-blank
+   "-" 'evil-last-non-blank)
 
   (general-define-key
    :states '(visual normal motion)
@@ -622,6 +633,30 @@ the cursor is moving "beyond" last character, so it's now remapped to ~evil-last
            (next-line)))
 #+end_src
 
+*** Search
+
+#+NAME: Search keymaps
+#+begin_src emacs-lisp
+  (leader-def
+    "s" '(:ignore t :which-key "[S]earch")
+    "s l" '(consult-line :which-key "[I]search")
+    "s L" '(consult-line-multi :which-key "[L]ines multi")
+    "s h" '(consult-isearch-history :which-key "[H]istory of isearch")
+    "s k" '(consult-keep-lines :which-key "[K]eep lines")
+    "s u" '(consult-focus-lines :which-key "[F]ocus lines"))
+
+  (general-define-key
+   :keymaps 'isearch-mode-map
+   "M-e"  'consult-isearch-history      
+   "M-s e"  'consult-isearch-history     
+   "M-s l"  'consult-line                 
+   "M-s L"  'consult-line-multi)
+
+  (general-define-key
+   :keymaps 'minibuffer-local-map
+   "M-h" 'consult-history
+   "M-r" 'consult-history)
+#+end_src
 *** Buffers 
 
 Buffers managerment:
@@ -729,6 +764,7 @@ Evaluating with **utop**.
   (leader-def
     "f" '(:ignore t :which-key "[F]ile")
     "f f" '(find-file :which-key "[F]ind file")
+    "f r" '(consult-recent-file :which-key "[R] file")
     "f s" '(save-buffer :which-key "[S]ave file"))
 #+end_src
 
@@ -811,4 +847,15 @@ Need to use GNU utils on windows.
 #+NAME: Setting default tab width
 #+begin_src emacs-lisp
   (setq-default tab-width 4)
+#+end_src
+
+** Recentf mode
+
+#+begin_src emacs-lisp
+  (use-package recentf
+    :ensure t
+    :init
+    (recentf-mode t)
+    :config
+    (setq recentf-max-saved-items 50))
 #+end_src
