@@ -2,13 +2,22 @@
 #+AUTHOR: DmitriiBr
 #+DATE: 19-12-2024
 
+* TODO Issues
+** Important
+
+1. [ ] Put keybinds into ~use-package~ initialization blocks;
+2. [ ] Split config into modules-like style to turn on and off them independently;
+
+** Not important
+
+1. [ ] Create ~.***rc~ file, like ~.doomrc~ for startup ci;
+
 * Emacs UI configuration
 ** Removing unneeded** * elements and features
 
+Other changes are in [[*Perfomance hacks from ~doomemacs~][Perfomance hacks from ~doomemacs~]]
+
 #+begin_src emacs-lisp
-  (scroll-bar-mode -1)
-  (menu-bar-mode -1)
-  (tool-bar-mode -1)
   (desktop-save-mode 1)
   (column-number-mode 1)
   (show-paren-mode 1)
@@ -64,6 +73,106 @@ Tao theme is a monochrome theme.
     (setq doom-themes-enable-bold t)
     (load-theme 'doom-one t)
     (doom-themes-org-config))
+#+end_src
+
+* Perfomance hacks from ~doomemacs~
+
+#+NAME: Reasonable defaults for interactive sessions
+#+begin_src emacs-lisp 
+      ;;; Runtime optimizations
+    ;; PERF: A second, case-insensitive pass over `auto-mode-alist' is time wasted.
+    (setq auto-mode-case-fold nil)
+
+    ;; PERF: Disable bidirectional text scanning for a modest performance boost.
+    ;;   I've set this to `nil' in the past, but the `bidi-display-reordering's docs
+    ;;   say that is an undefined state and suggest this to be just as good:
+    (setq-default bidi-display-reordering 'left-to-right
+                  bidi-paragraph-direction 'left-to-right)
+
+    ;; PERF: Disabling BPA makes redisplay faster, but might produce incorrect
+    ;;   reordering of bidirectional text with embedded parentheses (and other
+    ;;   bracket characters whose 'paired-bracket' Unicode property is non-nil).
+    (setq bidi-inhibit-bpa t)  ; Emacs 27+ only
+
+    ;; Reduce rendering/line scan work for Emacs by not rendering cursors or regions
+    ;; in non-focused windows.
+    (setq-default cursor-in-non-selected-windows nil)
+    (setq highlight-nonselected-windows nil)
+
+    ;; More performant rapid scrolling over unfontified regions. May cause brief
+    ;; spells of inaccurate syntax highlighting right after scrolling, which should
+    ;; quickly self-correct.
+    (setq fast-but-imprecise-scrolling t)
+
+    ;; Font compacting can be terribly expensive, especially for rendering icon
+    ;; fonts on Windows. Whether disabling it has a notable affect on Linux and Mac
+    ;; hasn't been determined, but do it anyway, just in case. This increases memory
+    ;; usage, however!
+    (setq inhibit-compacting-font-caches t)
+
+    ;; PGTK builds only: there's a timeout that adds latency to frame operations,
+    ;; like `make-frame-invisible', which Emacs frequently calls without a guard
+    ;; because it's inexpensive in non-PGTK builds. Lowering the timeout from the
+    ;; default 0.1 should make childframes and packages that manipulate them (like
+    ;; `lsp-ui', `company-box', and `posframe') feel much snappier. See
+    ;; emacs-lsp/lsp-ui#613.
+    (when (boundp 'pgtk-wait-for-event-timeout)
+      (setq pgtk-wait-for-event-timeout 0.001))
+
+    ;; Increase how much is read from processes in a single chunk (default is 4kb).
+    ;; This is further increased elsewhere, where needed (like our LSP module).
+    (setq read-process-output-max (* 64 1024))  ; 64kb
+
+    ;; Introduced in Emacs HEAD (b2f8c9f), this inhibits fontification while
+    ;; receiving input, which should help a little with scrolling performance.
+    (setq redisplay-skip-fontification-on-input t)
+
+    ;; Performance on Windows is considerably worse than elsewhere. We'll need
+    ;; everything we can get.
+    (when (boundp 'w32-get-true-file-attributes)
+      (setq w32-get-true-file-attributes nil    ; decrease file IO workload
+            w32-pipe-read-delay 0               ; faster IPC
+            w32-pipe-buffer-size (* 64 1024)))  ; read more at a time (was 4K)
+
+    ;; The GC introduces annoying pauses and stuttering into our Emacs experience,
+    ;; so we use `gcmh' to stave off the GC while we're using Emacs, and provoke it
+    ;; when it's idle. However, if the idle delay is too long, we run the risk of
+    ;; runaway memory usage in busy sessions. And if it's too low, then we may as
+    ;; well not be using gcmh at all.
+    (setq gcmh-idle-delay 'auto  ; default is 15s
+          gcmh-auto-idle-delay-factor 10
+          gcmh-high-cons-threshold (* 16 1024 1024))  ; 16mb
+
+      ;;; Disable UI elements early
+    ;; PERF,UI: Doom strives to be keyboard-centric, so I consider these UI elements
+    ;;   clutter. Initializing them also costs a morsel of startup time. What's
+    ;;   more, the menu bar exposes functionality that Doom doesn't endorse or
+    ;;   police. Perhaps one day Doom will support these, but today is not that day.
+    ;;   By disabling them early, we save Emacs some time.
+
+    ;; HACK: I intentionally avoid calling `menu-bar-mode', `tool-bar-mode', and
+    ;;   `scroll-bar-mode' because their manipulation of frame parameters can
+    ;;   trigger/queue a superfluous (and expensive, depending on the window system)
+    ;;   frame redraw at startup. The variables must be set to `nil' as well so
+    ;;   users don't have to call the functions twice to re-enable them.
+    (push '(menu-bar-lines . 0)   default-frame-alist)
+    (push '(tool-bar-lines . 0)   default-frame-alist)
+    (push '(vertical-scroll-bars) default-frame-alist)
+    (setq menu-bar-mode nil
+          tool-bar-mode nil
+          scroll-bar-mode nil)
+
+      ;;; Encodings
+    ;; Contrary to what many Emacs users have in their configs, you don't need more
+    ;; than this to make UTF-8 the default coding system:
+    (set-language-environment "UTF-8")
+    ;; ...but `set-language-environment' also sets `default-input-method', which is
+    ;; a step too opinionated.
+    (setq default-input-method nil)
+    ;; ...And the clipboard on Windows is often a wider encoding (UTF-16), so leave
+    ;; Emacs to its own devices there.
+    (unless (or 'cygwin 'windows-nt 'ms-dos)
+      (setq selection-coding-system 'utf-8))
 #+end_src
 
 * Garbage collection
@@ -147,46 +256,110 @@ Setting up evil everywhere.
     (evil-collection-init))
 #+end_src
 
-* Searching, Ido + Ivy modes
-** Ido mode
+* Completion ~:completion~
+** Ido mode *DISABLED*
 
 Setting it by default and changing separator.
 
 #+begin_src emacs-lisp
-  (ido-mode 1)
-  (ido-everywhere 1)
-  (setq ido-separator "\n")
+  ;; (ido-mode 1)
+  ;; (ido-everywhere 1)
+  ;; (setq ido-separator "\n")
 #+end_src
-
-** Ivy mode
-
-*** Ivy and bindings
+** Ivy mode *DISABLED*
+*** Ivy package
 
 Ivy prescient mode is a package, that enables history in minibuffer.
 
 #+begin_src emacs-lisp
-(use-package ivy
-  :ensure t
-  :demand t
-  :init
-  :config
-  (setq enable-recursive-minibuffers t)
-  (setq ivy-use-virtual-buffers t)
-  (setq ivy-count-format "%d/%d ")
-  (ivy-mode +1)
-  (ivy-prescient-mode +1))
+  (use-package ivy
+    :disabled t
+    :ensure t
+    :demand t
+    :config
+    (setq enable-recursive-minibuffers t)
+    (setq ivy-use-virtual-buffers t)
+    (setq ivy-count-format "%d/%d ")
+    (ivy-mode +1)
+    (ivy-prescient-mode +1))
 #+end_src
 
 *** Counsel
 
-Search engine for Ivy.
-
+#+NAME: Search engine
 #+begin_src emacs-lisp
-(use-package counsel
-  :ensure t
-  :demand t
-  :init
-  :config (counsel-mode +1))
+  (use-package counsel
+    :disabled t
+    :ensure t
+    :demand t
+    :config (counsel-mode +1))
+#+end_src
+
+** Vertico mode
+*** Vertico
+
++ [X] Start with plain Emacs (emacs -Q).
++ [X] Install and enable Vertico to get incremental minibuffer completion.
++ [X] Install Orderless and/or configure the built-in completion styles for more flexible minibuffer filtering.
++ [ ] Install Marginalia if you like rich minibuffer annotations.
++ [ ] Install Embark and add two keybindings for embark-dwim and embark-act.
+  I am using the mnemonic keybindings M-. and C-. since these commands allow you to act
+  on the object at point or in the minibuffer.
++ [X] Install Consult if you want additional featureful completion commands, e.g., the buffer
+  switcher consult-buffer with preview or the line-based search consult-line.
++ [ ] Install Embark-Consult and Wgrep for export from consult-line to occur-mode buffers and from
+  consult-grep to editable grep-mode buffers.
++ [ ] Fine tune Vertico with extensions.
+
+#+NAME: Vertico config
+#+begin_src emacs-lisp
+  (use-package vertico
+    :ensure t
+    :custom;
+    (vertico-scroll-margin 0) ;; Different scroll margin
+    (vertico-count 8) ;; Show more candidates
+    (vertico-resize nil) ;; Grow and shrink the Vertico minibuffer
+    (vertico-cycle t) ;; Enable cycling for `vertico-next/previous'
+    :init
+    (vertico-mode))
+#+end_src
+
+*** Orderless
+
+#+NAME: Orderless config
+#+begin_src emacs-lisp
+  (use-package orderless
+    :ensure t
+    :custom
+    ;; Configure a custom style dispatcher (see the Consult wiki)
+    ;; (orderless-style-dispatchers '(+orderless-consult-dispatch orderless-affix-dispatch))
+    ;; (orderless-component-separator #'orderless-escapable-split-on-space)
+    (completion-styles '(orderless basic))
+    (completion-category-defaults nil)
+    (completion-category-overrides '((file (styles partial-completion)))))
+#+end_src
+
+*** Consult
+
+All configurations are from [[https://github.com/minad/consult][Consult github]].
+
+#+NAME: Consult config
+#+begin_src emacs-lisp
+  (use-package consult
+    :hook (completion-list-mode . consult-preview-at-point-mode)
+
+    :init
+    (advice-add #'register-preview :override #'consult-register-window)
+    (setq register-preview-delay 0.5)
+    (setq xref-show-xrefs-function #'consult-xref
+          xref-show-definitions-function #'consult-xref)
+
+    :config
+    (consult-customize
+     consult-ripgrep consult-git-grep consult-grep
+     consult-bookmark consult-recent-file
+     consult--source-recent-file consult--source-project-recent-file consult--source-bookmark
+     :preview-key "C-SPC"))
 #+end_src
 
 * Which key
@@ -202,18 +375,18 @@ Search engine for Ivy.
   (setq which-key-idle-secondary-delay 0)
 #+end_src
 
-* Projectile
+* Projectile *DISABLED*
 
 Setting project engine.
+Emacs has greater alternative for projects ~project.el~
 
 #+begin_src emacs-lisp
-(use-package projectile
-  :ensure t
-  :demand t
-  :config
-  (projectile-mode +1))
-
-(setq projectile-completion-system 'ivy)
+  (use-package projectile
+    :disabled t
+    :ensure t
+    :demand t
+    :config
+    (projectile-mode +1))
 #+end_src
 
 * Smartparens
@@ -427,8 +600,7 @@ the cursor is moving "beyond" last character, so it's now remapped to ~evil-last
     :non-normal-prefix "M-SPC")
 
   (leader-def
-    ;; Improved M-x with counsel
-    "SPC" '(counsel-M-x :which-key "M-x")
+    "SPC" '(execute-extended-command :which-key "M-x")
     "w s m" '(which-key-show-major-mode :which-key "[W]K [M]AJOR MODE KEYMAPS"))
 
   (general-define-key
@@ -460,7 +632,7 @@ Buffers managerment:
 #+begin_src emacs-lisp
   (leader-def
     "b" '(:ignore t :which-key "[B]uffer")
-    "b s" '(switch-to-buffer :which-key "[S]witch to buffer")
+    "b s" '(consult-buffer :which-key "[S]witch to buffer")
     "b p" '(previous-buffer :which-key "[P]revious buffer")
     "b n" '(next-buffer :which-key "[N]ext buffer"))
 #+end_src
@@ -516,7 +688,8 @@ Buffers managerment:
     :keymaps 'emacs-lisp-mode-map
     "m" '(:ignore t :which-key "[M]AJOR MODE KEYMAPS")
     "m e" '(:ignore t :which-key "[E]val")
-    "m e e" '(eval-last-sexp :which-key "[E]val [e]xpression"))
+    "m e e" '(eval-last-sexp :which-key "[E]val [e]xpression")
+    "m e r" '(eval-region :which-key "[E]val [r]region"))
 #+end_src
 
 *** Tuareg-mode (Ocaml) keymaps
@@ -555,22 +728,21 @@ Evaluating with **utop**.
 #+begin_src emacs-lisp
   (leader-def
     "f" '(:ignore t :which-key "[F]ile")
-    "f f" '(counsel-find-file :which-key "[F]ind file")
-    "f g" '(counsel-git :which-key "counsel [g]it")
+    "f f" '(find-file :which-key "[F]ind file")
     "f s" '(save-buffer :which-key "[S]ave file"))
 #+end_src
 
 *** Project keymaps
 
-#+NAME: Projectile keymaps
+#+NAME: Project keymaps
 #+begin_src emacs-lisp
   (leader-def
     "p" '(:ignore t :which-key "[P]roject")
-    "p f" '(projectile-find-file :which-key "[F]ind file in project")
-    "p d" '(projectile-find-dir :which-key "find [d]ir in project")
-    "p s" '(counsel-git-grep :which-key "[S]earch for occurencies")
+    "p f" '(project-find-file :which-key "[F]ind file in project")
+    "p d" '(project-find-dir :which-key "find [d]ir in project")
+    "p s" '(consult-git-grep :which-key "[S]earch for occurencies")
     "p b" '(:ignore t :which-key "[B]uffers")
-    "p b s" '(projectile-switch-to-buffer :which-key "[S]witch to buffer"))
+    "p b s" '(consult-project-buffer :which-key "[S]witch to buffer"))
 #+end_src
 
 *** Magit keymaps
