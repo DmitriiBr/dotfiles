@@ -10,12 +10,11 @@
 (setq auto-save-default nil)
 (setq create-lockfiles nil)
 
-(setq-default truncate-lines t)
-(setq-default gloabal-visual-mode t)
-(global-auto-revert-mode t)
-
 (global-hl-line-mode 1) (add-to-list 'custom-theme-load-path "~/.emacs.d/etc/themes")
 (set-face-attribute 'default nil :font "Iosevka NF"  :height 190)
+
+(setq gloabal-visual-line-mode t)
+(global-auto-revert-mode t)
 
 (use-package tao-theme
   :ensure t
@@ -164,9 +163,10 @@
 (use-package evil
   :ensure t
   :init
-  (setq evil-insert-state-cursor '(bar . 3))
+  (setq evil-insert-state-cursor '(bar . 2))
   (setq evil-move-beyond-eol nil)
   (setq evil-want-keybinding nil)
+  (setq evil-respect-visual-line-mode t)
   :config
   (evil-mode 1)
   (evil-set-undo-system 'undo-redo))
@@ -176,6 +176,22 @@
   :config
   (setq evil-collection-mode-list '(dashboard dired ibuffer magit))
   (evil-collection-init))
+
+(use-package evil-surround
+  :ensure t
+  :config
+  (global-evil-surround-mode 1))
+
+(use-package evil-goggles
+  :ensure t
+  :config
+  (setq evil-goggles-enable-paste nil)
+  (setq evil-goggles-enable-shift nil)
+  (setq evil-goggles-enable-delete nil)
+  (setq evil-goggles-enable-join nil)
+  (setq evil-goggles-enable-undo nil)
+  (setq evil-goggles-enable-redo nil)
+  (evil-goggles-mode))
 
 ;; (ido-mode 1)
 ;; (ido-everywhere 1)
@@ -204,12 +220,13 @@
   (vertico-scroll-margin 0) ;; Different scroll margin
   (vertico-count 8) ;; Show more candidates
   (vertico-resize nil) ;; Grow and shrink the Vertico minibuffer
-  (vertico-cycle t) ;; Enable cycling for `vertico-next/previous'
+  (vertico-cycle t) ;; Enable cycling for `vertico-next/previous"
   :init
   (vertico-mode))
 
 (use-package vertico-multiform
-  :init
+  :after vertico
+  :config
   (add-to-list 'vertico-multiform-categories
                '(file
                  (+vertico-transform-functions . +vertico-highlight-directory)))
@@ -411,6 +428,14 @@
          (interactive)
          (duplicate-line)
          (next-line)))
+
+(general-define-key
+ :keymaps 'vertico-map
+ "M-RET" 'vertico-exit-input
+ "C-j"   'vertico-next
+ "C-M-j" 'vertico-next-group
+ "C-k"   'vertico-previous
+ "C-M-k" 'vertico-previous-group)
 
 (leader-def
   "s" '(:ignore t :which-key "[S]earch")

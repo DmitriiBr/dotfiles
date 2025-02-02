@@ -13,7 +13,7 @@
 1. [ ] Create ~.***rc~ file, like ~.doomrc~ for startup ci;
 
 * Emacs UI configuration
-** Removing unneeded** * elements and features
+** Removing unneeded elements and features
 
 Other changes are in [[*Perfomance hacks from ~doomemacs~][Perfomance hacks from ~doomemacs~]]
 
@@ -35,19 +35,18 @@ Other changes are in [[*Perfomance hacks from ~doomemacs~][Perfomance hacks from
   (setq create-lockfiles nil)
 #+end_src
 
-** Truncate lines like in normal editors
-
-#+begin_src emacs-lisp
-  (setq-default truncate-lines t)
-  (setq-default gloabal-visual-mode t)
-  (global-auto-revert-mode t)
-#+end_src
-
 ** Font configuration
 
 #+begin_src emacs-lisp
   (global-hl-line-mode 1) (add-to-list 'custom-theme-load-path "~/.emacs.d/etc/themes")
   (set-face-attribute 'default nil :font "Iosevka NF"  :height 190)
+#+end_src
+
+** Visual line mode
+
+#+begin_src emacs-lisp
+  (setq gloabal-visual-line-mode t)
+  (global-auto-revert-mode t)
 #+end_src
 
 ** Theme configuration
@@ -235,15 +234,16 @@ Setting evil mode:
   (use-package evil
     :ensure t
     :init
-    (setq evil-insert-state-cursor '(bar . 3))
+    (setq evil-insert-state-cursor '(bar . 2))
     (setq evil-move-beyond-eol nil)
     (setq evil-want-keybinding nil)
+    (setq evil-respect-visual-line-mode t)
     :config
     (evil-mode 1)
     (evil-set-undo-system 'undo-redo))
 #+end_src
 
-** Evil everywhere
+** Evil collection
 
 Setting up evil everywhere.
 
@@ -254,6 +254,32 @@ Setting up evil everywhere.
     :config
     (setq evil-collection-mode-list '(dashboard dired ibuffer magit))
     (evil-collection-init))
+#+end_src
+
+** Evil surround
+
+#+NAME: Evil surround config
+#+begin_src emacs-lisp
+  (use-package evil-surround
+    :ensure t
+    :config
+    (global-evil-surround-mode 1))
+#+end_src
+** Evil googles
+
+Highlight evil editing.
+
+#+begin_src emacs-lisp
+  (use-package evil-goggles
+    :ensure t
+    :config
+    (setq evil-goggles-enable-paste nil)
+    (setq evil-goggles-enable-shift nil)
+    (setq evil-goggles-enable-delete nil)
+    (setq evil-goggles-enable-join nil)
+    (setq evil-goggles-enable-undo nil)
+    (setq evil-goggles-enable-redo nil)
+    (evil-goggles-mode))
 #+end_src
 
 * Completion ~:completion~
@@ -306,7 +332,7 @@ Ivy prescient mode is a package, that enables history in minibuffer.
     (vertico-scroll-margin 0) ;; Different scroll margin
     (vertico-count 8) ;; Show more candidates
     (vertico-resize nil) ;; Grow and shrink the Vertico minibuffer
-    (vertico-cycle t) ;; Enable cycling for `vertico-next/previous'
+    (vertico-cycle t) ;; Enable cycling for `vertico-next/previous"
     :init
     (vertico-mode))
 #+end_src
@@ -580,7 +606,7 @@ Auto-format different source code files extremely intelligently
 
 ** General
 
-Using *general-package* kbd framework for bindings.
+Using *general-package* kbd framework for bindings
 
 *** Initializing
 
@@ -631,6 +657,19 @@ the cursor is moving "beyond" last character, so it's now remapped to ~evil-last
            (interactive)
            (duplicate-line)
            (next-line)))
+#+end_src
+
+*** Evil everywhere
+
+#+NAME: Vertico config (+evil-everywhere)
+#+begin_src emacs-lisp
+  (general-define-key
+   :keymaps 'vertico-map
+   "M-RET" 'vertico-exit-input
+   "C-j"   'vertico-next
+   "C-M-j" 'vertico-next-group
+   "C-k"   'vertico-previous
+   "C-M-k" 'vertico-previous-group)
 #+end_src
 
 *** Search
@@ -804,7 +843,7 @@ With this pacakge moving lines and regions are available
    "M-j" 'move-text-down)
 #+end_src
 
-* Misc
+ Misc
 ** Windows Git diff path
 
 Need to use GNU utils on windows.
@@ -859,3 +898,5 @@ Need to use GNU utils on windows.
     :config
     (setq recentf-max-saved-items 50))
 #+end_src
+
+
